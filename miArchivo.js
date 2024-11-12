@@ -27,7 +27,9 @@ let clients = [
     id: 2,
     cliente: "sushi seven",
   },
-  { id: 3, cliente: "sushi seven" },
+  { id: 3, 
+    cliente: "parrillaje",
+  },
 ];
 let orders = [
   {
@@ -139,7 +141,7 @@ function clientsMenu() {
         printClients(clients);
         break;
       case "2":
-        addIClient(clients);
+        addClient(clients);
         break;
       case "3":
         deleteClient(clients);
@@ -156,13 +158,19 @@ function clientsMenu() {
 function ordersMenu() {
   let opt;
   do {
-    alert("Elija una opción:\n1.- Consultar ordenes\n 2.- Regresar");
+    alert("Elija una opción:\n1.- Consultar ordenes\n2.- Agregar ordenes\n1.- Eliminar ordenes\n4.- Regresar");
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
       case "1":
         printOrders(orders);
         break;
       case "2":
+        addOrder(orders,products);
+        break;
+      case "3":
+        deleteOrder(orders);
+        break;
+      case "4":
         return 0;
       default:
         alert("Opción no valida");
@@ -212,8 +220,6 @@ function printOrders(items) {
 
 function addProduct(items) {
   let product = prompt("Ingrese el producto a agregar: ");
-  let qty = prompt("Ingrese la cantidad de producto a agregar: ");
-  let price = prompt("Ingrese el precio del producto: ");
   const exists = items.some(
     (item) => item.producto.toLowerCase() === product.toLowerCase()
   );
@@ -221,6 +227,8 @@ function addProduct(items) {
     alert(`El producto '${product}' ya existe.`);
     return 0;
   }
+  let qty = prompt("Ingrese la cantidad de producto a agregar: ");
+  let price = prompt("Ingrese el precio del producto: ");
 
   const maxId = items.length > 0 ? Math.max(...items.map((p) => p.id)) : 1200;
   const newId = maxId + 1;
@@ -238,51 +246,120 @@ function addProduct(items) {
 }
 
 function deleteProduct(items) {
-    let productD = prompt("Ingrese el producto a eliminar: ");
-    
-    let i = items.findIndex((item) => item.producto.toLowerCase() === productD.toLowerCase());
-    
-    if (i !== -1) {
-      items.splice(i, 1);  
-      alert("Producto eliminado con éxito");
-    } else {
-      alert("Producto no encontrado.");
-    }
-  }
-  
-function addClient(items) {
-  let newC = prompt("Ingrese nombre del cliente a agregar: ");
+  let productD = prompt("Ingrese el producto a eliminar: ");
 
-  const exists = items.some(
-    (item) => item.cliente.toLowerCase() === newC.toLowerCase()
+  let i = items.findIndex(
+    (item) => item.producto.toLowerCase() === productD.toLowerCase()
   );
-  if (exists) {
-    alert(`El cliente '${newC}' ya existe.`);
-    return;
+
+  if (i !== -1) {
+    items.splice(i, 1);
+    alert("Producto eliminado con éxito");
+  } else {
+    alert("Producto no encontrado.");
   }
-
-  const maxId =
-    items.length > 0 ? Math.max(...items.map((item) => item.id)) : 0;
-  const newId = maxId + 1;
-
-  const newClient = { id: newId, cliente: newC };
-
-  items.push(newClient);
-
-  alert("Cliente agregado con éxito");
 }
 
-function deleteClient(clients) {
-    let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
+function addClient(items) {
+    let newC = prompt("Ingrese nombre del cliente a agregar: ");
   
-    let i = clients.findIndex(
-      (client) => client.cliente.toLowerCase() === clientD.toLowerCase()
+    const exists = items.some(
+      (item) => item.cliente.toLowerCase() === newC.toLowerCase()
     );
+    if (exists) {
+      alert(`El cliente '${newC}' ya existe.`);
+      return;
+    }
   
-    if (i !== -1) {
-      clients.splice(i, 1); 
-      alert("Cliente eliminado con éxito");
+    const maxId = items.length > 0 ? Math.max(...items.map((item) => item.id)) : 0;
+    const newId = maxId + 1;
+  
+    const newClient = { id: newId, cliente: newC };
+    items.push(newClient);
+  
+    alert("Cliente agregado con éxito");
+  }
+  
+
+function deleteClient(clients) {
+  let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
+
+  let i = clients.findIndex(
+    (client) => client.cliente.toLowerCase() === clientD.toLowerCase()
+  );
+
+  if (i !== -1) {
+    clients.splice(i, 1);
+    alert("Cliente eliminado con éxito");
+  } else {
+    alert("Cliente no encontrado.");
+  }
+}
+
+function addOrder(orders, products) {
+    let idCliente = parseInt(prompt("Ingrese el ID del cliente para esta orden: "));
+  
+    let productosOrden = [];
+    let totalOrden = 0;
+  
+    while (true) {
+      let productName = prompt("Ingrese el nombre del producto (o escriba 'salir' para terminar): ");
+      if (productName.toLowerCase() === 'salir') break;
+  
+      let product = products.find(prod => prod.producto.toLowerCase() === productName.toLowerCase());
+  
+      if (!product) {
+        alert("Producto no encontrado. Intente nuevamente.");
+        continue;
+      }
+  
+      let cantidad = parseInt(prompt(`Ingrese la cantidad de ${productName}: `));
+  
+      if (cantidad > product.cantidad) {
+        alert(`Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`);
+        continue;
+      }
+  
+      let totalProducto = product.precio * cantidad;
+      totalOrden += totalProducto;
+  
+      let productoEnOrden = {
+        id: product.id,
+        nombre: product.producto,
+        cantidad: cantidad,
+        total: totalProducto
+      };
+  
+      product.cantidad -= cantidad;
+  
+      productosOrden.push(productoEnOrden);
+    }
+  
+    const maxId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) : 1;
+    const newId = maxId + 1;
+  
+    const newOrder = {
+      id: newId,
+      idCliente: idCliente,
+      productos: productosOrden,
+      total: totalOrden
+    };
+  
+    orders.push(newOrder);
+  
+    alert("Orden agregada con éxito");
+  }
+
+  function deleteOrder(orders) {
+    let orderId = parseInt(prompt("Ingrese el ID de la orden a eliminar: "));
+  
+    let index = orders.findIndex(order => order.id === orderId);
+  
+    if (index !== -1) {
+      orders.splice(index, 1);
+      alert("Orden eliminada con éxito.");
     } else {
-      alert("Cliente no encontrado.");
+      alert("Orden no encontrada.");
     }
   }
+  
