@@ -1,119 +1,261 @@
-let products = ["Bacalao", "Camaron", "Robalo", "Jaiba"]
-let clients = ["Allegue", "Parrillaje", "Sushi Seven"]
-const user = "Admin"
-const pass = "123456"
+let products = [
+  {
+    id: 1200,
+    producto: "camarón",
+    cantidad: 1000,
+    precio: 250,
+  },
+  {
+    id: 1201,
+    producto: "pulpo",
+    cantidad: 200,
+    precio: 100,
+  },
+  {
+    id: 1202,
+    producto: "salmón",
+    cantidad: 100,
+    precio: 300,
+  },
+];
+let clients = [
+  {
+    id: 1,
+    cliente: "allegue",
+  },
+  {
+    id: 2,
+    cliente: "sushi seven",
+  },
+  { id: 3, cliente: "sushi seven" },
+];
+let orders = [
+  {
+    id: 1,
+    idCliente: 1,
+    productos: [
+      {
+        id: 1200,
+        nombre: "camarón",
+        cantidad: 2,
+        total: 500,
+      },
+      {
+        id: 1201,
+        nombre: "pulpo",
+        cantidad: 1,
+        total: 100,
+      },
+    ],
+    total: 600,
+  },
+];
+const user = "Admin";
+const pass = "123456";
 
-login()
+login();
 
-function login (){
-    let flg
-    do{
-        let logUsr = prompt("Ingrese su nombre de ususario: ")
-        let logPass = prompt("Ingrese su contraseña: ")
-        if((logUsr === user) && (logPass === pass)){
-            flg = 1
-            alert("Inicio de sesión exitoso")
-            mainMenu()
-        }
-        else{
-            alert("Vuelva a intentarlo")
-        }
-    }while(flg !== 1)
-}
-
-function mainMenu(){
-    let opt
-    do{
-        alert("Elija una opción:\n1.- Productos\n2.- Clientes\n3.- Salir");
-        
-        opt = prompt("Ingrese una opción: ")
-        switch(opt){
-            case '1':
-                productsMenu()
-            break;
-            case '2':
-                clientsMenu()
-            break;
-            case '3':
-                alert("Nos vemos pronto")
-            return 0;
-            default:
-                alert("Opción no valida")
-                break;
-        }
-    }while(opt !== 3)
-}
-
-function productsMenu(){
-    let opt
-    do{
-        alert("Elija una opción:\n1.- Consultar productos\n2.- Añadir productos\n3.- Eliminar producto\n 4.- Regresar");
-        opt = prompt("Ingrese una opción: ")
-        switch(opt){
-            case '1':
-                printItems(products)
-            break;
-            case '2':
-                addItem(products)
-                break;
-            case '3':
-                deleteItem(products)
-                break;
-            case '4':
-            return 0;
-            default:
-                alert("Opción no valida")
-                break;
-            
-        }
-    }while(opt !== 4)
-}
-
-function clientsMenu(){
-    let opt
-    do{
-        alert("Elija una opción:\n1.- Consultar clientes\n2.- Añadir cliente\n3.- Eliminar cliente\n 4.- Regresar");
-        opt = prompt("Ingrese una opción: ")
-        switch(opt){
-            case '1':
-                printItems(clients)
-            break;
-            case '2':
-                addItem(clients)
-                break;
-            case '3':
-                deleteItem(clients)
-                break;
-            case '4':
-            return 0;
-            default:
-                alert("Opción no valida")
-                break;
-        }
-    }while(opt !== 4)
-}
-
-function printItems(items){
-    let msg = []
-    for(let i = 0; i < items.length; i++){
-        msg.push(`${i + 1} - ${items[i]}`)
-    }
-    alert(msg.join('\n'))
-}
-
-function addItem(items){
-    let newItem = prompt("Ingrese el nuevo elemento: ")
-    items.push(newItem)
-    alert("Producto agregado con éxito")
-}
-
-function deleteItem(items){
-    let itemD = prompt("Ingrese el elemento a eliminar: ");
-    let i = items.findIndex(item => item.toLowerCase() === itemD.toLowerCase());
-    if (i !== -1) { 
-        items.splice(i, 1);
-        alert("Elemento eliminado con éxito");
+function login() {
+  let flg;
+  do {
+    let logUsr = prompt("Ingrese su nombre de ususario: ");
+    alert(
+      "Por motivos de seguridad, la contraseña no se mostrará en pantalla. Escríbala de memoria."
+    );
+    let logPass = prompt("Ingrese su contraseña: ");
+    if (logUsr === user && logPass === pass) {
+      flg = 1;
+      alert("Inicio de sesión exitoso");
+      mainMenu();
     } else {
-        alert("Elemento no encontrado.");
+      alert("Vuelva a intentarlo");
     }
+  } while (flg !== 1);
+}
+
+function mainMenu() {
+  let opt;
+  do {
+    alert("Elija una opción:\n1.- Productos\n2.- Clientes\n3.- Ordenes\n4.- Salir");
+
+    opt = prompt("Ingrese una opción: ");
+    switch (opt) {
+      case "1":
+        productsMenu();
+        break;
+      case "2":
+        clientsMenu();
+        break;
+      case "3":
+        ordersMenu();
+        break;
+      case "4":
+        alert("Nos vemos pronto");
+        return 0;
+      default:
+        alert("Opción no valida");
+        break;
+    }
+  } while (opt !== 3);
+}
+
+function productsMenu() {
+  let opt;
+  do {
+    alert(
+      "Elija una opción:\n1.- Consultar productos\n2.- Añadir productos\n3.- Eliminar producto\n 4.- Regresar"
+    );
+    opt = prompt("Ingrese una opción: ");
+    switch (opt) {
+      case "1":
+        printProdcs(products);
+        break;
+      case "2":
+        addProduct(products);
+        break;
+      case "3":
+        deleteProduct(products);
+        break;
+      case "4":
+        return 0;
+      default:
+        alert("Opción no valida");
+        break;
+    }
+  } while (opt !== 4);
+}
+
+function clientsMenu() {
+    let opt;
+    do {
+      alert(
+        "Elija una opción:\n1.- Consultar clientes\n2.- Añadir cliente\n3.- Eliminar cliente\n 4.- Regresar"
+      );
+      opt = prompt("Ingrese una opción: ");
+      switch (opt) {
+        case "1":
+          printClients(clients);
+          break;
+        case "2":
+          addIClient(clients);
+          break;
+        case "3":
+          deleteClient(clients);
+          break;
+        case "4":
+          return 0;
+        default:
+          alert("Opción no valida");
+          break;
+      }
+    } while (opt !== 4);
+  }
+
+function ordersMenu() {
+  let opt;
+  do {
+    alert(
+      "Elija una opción:\n1.- Consultar ordenes\n 2.- Regresar"
+    );
+    opt = prompt("Ingrese una opción: ");
+    switch (opt) {
+      case "1":
+        printOrders(orders);
+        break;
+      case "2":
+        return 0;
+      default:
+        alert("Opción no valida");
+        break;
+    }
+  } while (opt !== 4);
+}
+
+function printProdcs(items) {
+  let msg = [];
+  for (let item of items) {
+    msg.push(
+      `${item.id} - ${item.producto} - ${item.cantidad} - ${item.precio}`
+    );
+  }
+  alert(msg.join("\n"));
+}
+
+function printClients(items) {
+  let msg = [];
+  for (let item of items) {
+    msg.push(`${item.id} - ${item.cliente}`);
+  }
+  alert(msg.join("\n"));
+}
+
+function printOrders(items) {
+    let msg = [];
+    
+    for (let order of items) {
+      msg.push(`Orden ID: ${order.id}`);
+      msg.push(`Cliente ID: ${order.idCliente}`);
+      msg.push("Productos:");
+      
+      for (let producto of order.productos) {
+        msg.push(`  - ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total}`);
+      }
+      
+      msg.push(`Total de la orden: $${order.total}`);
+      msg.push("");
+    }
+    
+    alert(msg.join("\n"));
+  }
+
+  function addProduct(items) {
+    let product = prompt("Ingrese el producto a agregar: ")
+    let qty = prompt("Ingrese la cantidad de producto a agregar: ")
+    let price = prompt("Ingrese el precio del producto: ")
+    const exists = items.some(item => item.producto.toLowerCase() === product.toLowerCase());
+    if (exists) {
+      console.log(`El producto '${product}' ya existe.`);
+      return 0;
+    }
+  
+    const maxId = items.length > 0 ? Math.max(...items.map(p => p.id)) : 1200;
+    const newId = maxId + 1;
+  
+    const newProduct = { id: newId, producto: product, cantidad: qty, precio: price };
+  
+    items.push(newProduct);
+
+    alert("Producto agregado con éxito")
+  }
+
+  function deleteProduct(items) {
+    let itemD = prompt("Ingrese el producto a eliminar: ");
+    
+    let i = items.findIndex((item) => item.producto.toLowerCase() === itemD.toLowerCase());
+    
+    if (i !== -1) {
+      items.splice(i, 1);
+      alert("Producto eliminado con éxito");
+    } else {
+      alert("Producto no encontrado.");
+    }
+  }
+
+function addClient(items){
+  let newC = prompt("Ingrese nombre del cliente a agregar: ");
+  
+  const exists = items.some(item => item.cliente.toLowerCase() === newC.toLowerCase());
+  if (exists) {
+    alert(`El cliente '${newC}' ya existe.`);
+    return;
+  }
+  
+  const maxId = items.length > 0 ? Math.max(...items.map(item => item.id)) : 0;
+  const newId = maxId + 1;
+  
+  const newClient = { id: newId, cliente: newC };
+  
+  items.push(newClient);
+
+  alert("Cliente agregado con éxito");
 }
