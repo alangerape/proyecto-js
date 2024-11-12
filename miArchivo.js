@@ -237,21 +237,19 @@ function addProduct(items) {
   alert("Producto agregado con éxito");
 }
 
-function deleteClient(clients) {
-    let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
-  
-    let i = clients.findIndex(
-      (client) => client.cliente.toLowerCase() === clientD.toLowerCase()
-    );
-  
+function deleteProduct(items) {
+    let productD = prompt("Ingrese el producto a eliminar: ");
+    
+    let i = items.findIndex((item) => item.producto.toLowerCase() === productD.toLowerCase());
+    
     if (i !== -1) {
-      clients.splice(i, 1); 
-      alert("Cliente eliminado con éxito");
+      items.splice(i, 1);  
+      alert("Producto eliminado con éxito");
     } else {
-      alert("Cliente no encontrado.");
+      alert("Producto no encontrado.");
     }
   }
-
+  
 function addClient(items) {
   let newC = prompt("Ingrese nombre del cliente a agregar: ");
 
@@ -273,3 +271,18 @@ function addClient(items) {
 
   alert("Cliente agregado con éxito");
 }
+
+function deleteClient(clients) {
+    let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
+  
+    let i = clients.findIndex(
+      (client) => client.cliente.toLowerCase() === clientD.toLowerCase()
+    );
+  
+    if (i !== -1) {
+      clients.splice(i, 1); 
+      alert("Cliente eliminado con éxito");
+    } else {
+      alert("Cliente no encontrado.");
+    }
+  }
