@@ -76,7 +76,9 @@ function login() {
 function mainMenu() {
   let opt;
   do {
-    alert("Elija una opción:\n1.- Productos\n2.- Clientes\n3.- Ordenes\n4.- Salir");
+    alert(
+      "Elija una opción:\n1.- Productos\n2.- Clientes\n3.- Ordenes\n4.- Salir"
+    );
 
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
@@ -126,37 +128,35 @@ function productsMenu() {
 }
 
 function clientsMenu() {
-    let opt;
-    do {
-      alert(
-        "Elija una opción:\n1.- Consultar clientes\n2.- Añadir cliente\n3.- Eliminar cliente\n 4.- Regresar"
-      );
-      opt = prompt("Ingrese una opción: ");
-      switch (opt) {
-        case "1":
-          printClients(clients);
-          break;
-        case "2":
-          addIClient(clients);
-          break;
-        case "3":
-          deleteClient(clients);
-          break;
-        case "4":
-          return 0;
-        default:
-          alert("Opción no valida");
-          break;
-      }
-    } while (opt !== 4);
-  }
+  let opt;
+  do {
+    alert(
+      "Elija una opción:\n1.- Consultar clientes\n2.- Añadir cliente\n3.- Eliminar cliente\n 4.- Regresar"
+    );
+    opt = prompt("Ingrese una opción: ");
+    switch (opt) {
+      case "1":
+        printClients(clients);
+        break;
+      case "2":
+        addIClient(clients);
+        break;
+      case "3":
+        deleteClient(clients);
+        break;
+      case "4":
+        return 0;
+      default:
+        alert("Opción no valida");
+        break;
+    }
+  } while (opt !== 4);
+}
 
 function ordersMenu() {
   let opt;
   do {
-    alert(
-      "Elija una opción:\n1.- Consultar ordenes\n 2.- Regresar"
-    );
+    alert("Elija una opción:\n1.- Consultar ordenes\n 2.- Regresar");
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
       case "1":
@@ -190,71 +190,85 @@ function printClients(items) {
 }
 
 function printOrders(items) {
-    let msg = [];
-    
-    for (let order of items) {
-      msg.push(`Orden ID: ${order.id}`);
-      msg.push(`Cliente ID: ${order.idCliente}`);
-      msg.push("Productos:");
-      
-      for (let producto of order.productos) {
-        msg.push(`  - ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total}`);
-      }
-      
-      msg.push(`Total de la orden: $${order.total}`);
-      msg.push("");
+  let msg = [];
+
+  for (let order of items) {
+    msg.push(`Orden ID: ${order.id}`);
+    msg.push(`Cliente ID: ${order.idCliente}`);
+    msg.push("Productos:");
+
+    for (let producto of order.productos) {
+      msg.push(
+        `  - ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total}`
+      );
     }
-    
-    alert(msg.join("\n"));
+
+    msg.push(`Total de la orden: $${order.total}`);
+    msg.push("");
   }
 
-  function addProduct(items) {
-    let product = prompt("Ingrese el producto a agregar: ")
-    let qty = prompt("Ingrese la cantidad de producto a agregar: ")
-    let price = prompt("Ingrese el precio del producto: ")
-    const exists = items.some(item => item.producto.toLowerCase() === product.toLowerCase());
-    if (exists) {
-      console.log(`El producto '${product}' ya existe.`);
-      return 0;
-    }
-  
-    const maxId = items.length > 0 ? Math.max(...items.map(p => p.id)) : 1200;
-    const newId = maxId + 1;
-  
-    const newProduct = { id: newId, producto: product, cantidad: qty, precio: price };
-  
-    items.push(newProduct);
+  alert(msg.join("\n"));
+}
 
-    alert("Producto agregado con éxito")
+function addProduct(items) {
+  let product = prompt("Ingrese el producto a agregar: ");
+  let qty = prompt("Ingrese la cantidad de producto a agregar: ");
+  let price = prompt("Ingrese el precio del producto: ");
+  const exists = items.some(
+    (item) => item.producto.toLowerCase() === product.toLowerCase()
+  );
+  if (exists) {
+    alert(`El producto '${product}' ya existe.`);
+    return 0;
   }
 
-  function deleteProduct(items) {
-    let itemD = prompt("Ingrese el producto a eliminar: ");
-    
-    let i = items.findIndex((item) => item.producto.toLowerCase() === itemD.toLowerCase());
-    
+  const maxId = items.length > 0 ? Math.max(...items.map((p) => p.id)) : 1200;
+  const newId = maxId + 1;
+
+  const newProduct = {
+    id: newId,
+    producto: product,
+    cantidad: qty,
+    precio: price,
+  };
+
+  items.push(newProduct);
+
+  alert("Producto agregado con éxito");
+}
+
+function deleteClient(clients) {
+    let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
+  
+    let i = clients.findIndex(
+      (client) => client.cliente.toLowerCase() === clientD.toLowerCase()
+    );
+  
     if (i !== -1) {
-      items.splice(i, 1);
-      alert("Producto eliminado con éxito");
+      clients.splice(i, 1); 
+      alert("Cliente eliminado con éxito");
     } else {
-      alert("Producto no encontrado.");
+      alert("Cliente no encontrado.");
     }
   }
 
-function addClient(items){
+function addClient(items) {
   let newC = prompt("Ingrese nombre del cliente a agregar: ");
-  
-  const exists = items.some(item => item.cliente.toLowerCase() === newC.toLowerCase());
+
+  const exists = items.some(
+    (item) => item.cliente.toLowerCase() === newC.toLowerCase()
+  );
   if (exists) {
     alert(`El cliente '${newC}' ya existe.`);
     return;
   }
-  
-  const maxId = items.length > 0 ? Math.max(...items.map(item => item.id)) : 0;
+
+  const maxId =
+    items.length > 0 ? Math.max(...items.map((item) => item.id)) : 0;
   const newId = maxId + 1;
-  
+
   const newClient = { id: newId, cliente: newC };
-  
+
   items.push(newClient);
 
   alert("Cliente agregado con éxito");
