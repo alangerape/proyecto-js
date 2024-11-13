@@ -55,6 +55,21 @@ let orders = [
 const user = "Admin";
 const pass = "123456";
 
+const MAIN_MENU_OPTIONS = {
+  PRODUCTS: "1",
+  CLIENTS: "2",
+  ORDERS: "3",
+  EXIT: "4",
+};
+
+const SUB_MENU_OPTIONS = {
+  PRINT: "1",
+  ADD: "2",
+  EDIT: "3",
+  DELETE: "4",
+  BACK: "5",
+}
+
 login();
 
 function login() {
@@ -79,111 +94,120 @@ function mainMenu() {
   let opt;
   do {
     alert(
-      "Elija una opción:\n1.- Productos\n2.- Clientes\n3.- Ordenes\n4.- Salir"
+      `Elija una opción:\n${MAIN_MENU_OPTIONS.PRODUCTS}.- Productos\n${MAIN_MENU_OPTIONS.CLIENTS}.- Clientes\n${MAIN_MENU_OPTIONS.ORDERS}.- Ordenes\n${MAIN_MENU_OPTIONS.EXIT}.- Salir`
     );
 
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
-      case "1":
+      case MAIN_MENU_OPTIONS.PRODUCTS:
         productsMenu();
         break;
-      case "2":
+      case MAIN_MENU_OPTIONS.CLIENTS:
         clientsMenu();
         break;
-      case "3":
+      case MAIN_MENU_OPTIONS.ORDERS:
         ordersMenu();
         break;
-      case "4":
+      case MAIN_MENU_OPTIONS.EXIT:
         alert("Nos vemos pronto");
         return 0;
       default:
-        alert("Opción no valida");
+        alert("Opción no válida");
         break;
     }
-  } while (opt !== 3);
+  } while (opt !== MAIN_MENU_OPTIONS.EXIT);
 }
 
 function productsMenu() {
   let opt;
   do {
     alert(
-      "Elija una opción:\n1.- Consultar productos\n2.- Añadir productos\n3.- Eliminar producto\n 4.- Regresar"
+      `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar productos\n${SUB_MENU_OPTIONS.ADD}.- Añadir productos\n${SUB_MENU_OPTIONS.EDIT}.- Editar producto\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar producto\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
     );
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
-      case "1":
+      case SUB_MENU_OPTIONS.PRINT:
         printProdcs(products);
         break;
-      case "2":
+      case SUB_MENU_OPTIONS.ADD:
         addProduct(products);
         break;
-      case "3":
+      case SUB_MENU_OPTIONS.EDIT:
+        editProduct(products);
+        break;
+      case SUB_MENU_OPTIONS.DELETE:
         deleteProduct(products);
         break;
-      case "4":
+      case SUB_MENU_OPTIONS.BACK:
         return 0;
       default:
         alert("Opción no valida");
         break;
     }
-  } while (opt !== 4);
+  } while (opt !== SUB_MENU_OPTIONS.BACK);
 }
 
 function clientsMenu() {
   let opt;
   do {
     alert(
-      "Elija una opción:\n1.- Consultar clientes\n2.- Añadir cliente\n3.- Eliminar cliente\n 4.- Regresar"
+      `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar clientes\n${SUB_MENU_OPTIONS.ADD}.- Añadir cliente\n${SUB_MENU_OPTIONS.EDIT}.- Editar cliente\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar cliente\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
     );
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
-      case "1":
+      case SUB_MENU_OPTIONS.PRINT:
         printClients(clients);
         break;
-      case "2":
+      case SUB_MENU_OPTIONS.ADD:
         addClient(clients);
         break;
-      case "3":
+      case SUB_MENU_OPTIONS.EDIT:
+        editClient(clients);
+        break;
+      case SUB_MENU_OPTIONS.DELETE:
         deleteClient(clients);
         break;
-      case "4":
+      case SUB_MENU_OPTIONS.BACK:
         return 0;
       default:
         alert("Opción no valida");
         break;
     }
-  } while (opt !== "4");
+  } while (opt !== SUB_MENU_OPTIONS.BACK);
 }
 
 function ordersMenu() {
   let opt;
   do {
-    alert("Elija una opción:\n1.- Consultar ordenes\n2.- Agregar ordenes\n3.- Eliminar ordenes\n4.- Regresar");
+    alert(`Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar ordenes\n${SUB_MENU_OPTIONS.ADD}.- Agregar orden\n${SUB_MENU_OPTIONS.EDIT}.- Editar orden\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar orden\n${SUB_MENU_OPTIONS.BACK}.- Regresar`);
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
-      case "1":
+      case SUB_MENU_OPTIONS.PRINT:
         printOrders(orders);
         break;
-      case "2":
+      case SUB_MENU_OPTIONS.ADD:
         addOrder(orders,products);
         break;
-      case "3":
+      case SUB_MENU_OPTIONS.EDIT:
+        editOrder(orders,products);
+        break;
+      case SUB_MENU_OPTIONS.DELETE:
         deleteOrder(orders);
         break;
-      case "4":
+      case SUB_MENU_OPTIONS.BACK:
         return 0;
       default:
         alert("Opción no valida");
         break;
     }
-  } while (opt !== 4);
+  } while (opt !== SUB_MENU_OPTIONS.BACK);
 }
 
 function printProdcs(items) {
   let msg = [];
   for (let item of items) {
     msg.push(
-      `${item.id} - ${item.producto} - ${item.cantidad} - ${item.precio}`
+      `ID: ${item.id} - Producto: ${item.producto} - Cantidad en inventario: ${item.cantidad} Kg - Precio: ${item.precio} MXN`
     );
   }
   alert(msg.join("\n"));
@@ -192,7 +216,7 @@ function printProdcs(items) {
 function printClients(items) {
   let msg = [];
   for (let item of items) {
-    msg.push(`${item.id} - ${item.cliente}`);
+    msg.push(`ID: ${item.id} - Cliente: ${item.cliente}`);
   }
   alert(msg.join("\n"));
 }
@@ -207,11 +231,11 @@ function printOrders(items) {
 
     for (let producto of order.productos) {
       msg.push(
-        `  - ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total}`
+        `  -Producto: ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total} MXN`
       );
     }
 
-    msg.push(`Total de la orden: $${order.total}`);
+    msg.push(`Total de la orden: $${order.total} MXN`);
     msg.push("");
   }
 
