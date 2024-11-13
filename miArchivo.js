@@ -152,7 +152,7 @@ function clientsMenu() {
         alert("Opción no valida");
         break;
     }
-  } while (opt !== 4);
+  } while (opt !== "4");
 }
 
 function ordersMenu() {
@@ -246,6 +246,9 @@ function addProduct(items) {
 }
 
 function deleteProduct(items) {
+
+  printProdcs(items)
+  
   let productD = prompt("Ingrese el producto a eliminar: ");
 
   let i = items.findIndex(
@@ -278,18 +281,17 @@ function addClient(items) {
     items.push(newClient);
   
     alert("Cliente agregado con éxito");
-  }
+}
   
-
-function deleteClient(clients) {
+function deleteClient(items) {
   let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
 
-  let i = clients.findIndex(
-    (client) => client.cliente.toLowerCase() === clientD.toLowerCase()
+  let i = items.findIndex(
+    (item) => item.cliente.toLowerCase() === clientD.toLowerCase()
   );
 
   if (i !== -1) {
-    clients.splice(i, 1);
+    items.splice(i, 1);
     alert("Cliente eliminado con éxito");
   } else {
     alert("Cliente no encontrado.");
@@ -348,9 +350,12 @@ function addOrder(orders, products) {
     orders.push(newOrder);
   
     alert("Orden agregada con éxito");
-  }
+}
 
   function deleteOrder(orders) {
+
+    printOrders(orders)
+
     let orderId = parseInt(prompt("Ingrese el ID de la orden a eliminar: "));
   
     let index = orders.findIndex(order => order.id === orderId);
@@ -361,5 +366,5 @@ function addOrder(orders, products) {
     } else {
       alert("Orden no encontrada.");
     }
-  }
+}
   
