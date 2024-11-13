@@ -77,7 +77,7 @@ function login() {
   do {
     let logUsr = prompt("Ingrese su nombre de ususario: ");
     alert(
-      "Por motivos de seguridad, la contraseña no se mostrará en pantalla. Escríbala de memoria."
+      "Por motivos de seguridad, la contraseña no se mostrará en pantalla. Escríbala de memoria. (Prompt no permite ocultar los cacarteres de su campo de entrada como una contraseña)"
     );
     let logPass = prompt("Ingrese su contraseña: ");
     if (logUsr === user && logPass === pass) {
