@@ -158,7 +158,7 @@ function clientsMenu() {
 function ordersMenu() {
   let opt;
   do {
-    alert("Elija una opción:\n1.- Consultar ordenes\n2.- Agregar ordenes\n1.- Eliminar ordenes\n4.- Regresar");
+    alert("Elija una opción:\n1.- Consultar ordenes\n2.- Agregar ordenes\n3.- Eliminar ordenes\n4.- Regresar");
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
       case "1":
@@ -245,6 +245,29 @@ function addProduct(items) {
   alert("Producto agregado con éxito");
 }
 
+function editProduct(items) {
+  let product = prompt("Ingrese el nombre del producto a editar: ");
+
+  let productToEdit = items.find(
+    (item) => item.producto.toLowerCase() === product.toLowerCase()
+  );
+
+  if (!productToEdit) {
+    alert(`El producto '${product}' no se encontró.`);
+    return;
+  }
+
+  let newProductName = prompt(`Ingrese el nuevo nombre del producto (${productToEdit.producto}): `, productToEdit.producto);
+  let newQty = prompt(`Ingrese la nueva cantidad (${productToEdit.cantidad}): `, productToEdit.cantidad);
+  let newPrice = prompt(`Ingrese el nuevo precio (${productToEdit.precio}): `, productToEdit.precio);
+
+  productToEdit.producto = newProductName || productToEdit.producto;
+  productToEdit.cantidad = newQty || productToEdit.cantidad;
+  productToEdit.precio = newPrice || productToEdit.precio;
+
+  alert("Producto editado con éxito");
+}
+
 function deleteProduct(items) {
 
   printProdcs(items)
@@ -283,6 +306,25 @@ function addClient(items) {
     alert("Cliente agregado con éxito");
 }
   
+function editClient(items) {
+  let clientName = prompt("Ingrese el nombre del cliente a editar: ");
+  
+  const clientToEdit = items.find(
+    (item) => item.cliente.toLowerCase() === clientName.toLowerCase()
+  );
+
+  if (!clientToEdit) {
+    alert(`El cliente '${clientName}' no fue encontrado.`);
+    return;
+  }
+
+  let newClientName = prompt(`Ingrese el nuevo nombre para el cliente '${clientToEdit.cliente}' (o presione Enter para mantener el nombre actual):`);
+
+  clientToEdit.cliente = newClientName || clientToEdit.cliente;
+
+  alert("Cliente editado con éxito");
+}
+
 function deleteClient(items) {
   let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
 
@@ -352,16 +394,68 @@ function addOrder(orders, products) {
     alert("Orden agregada con éxito");
 }
 
-  function deleteOrder(orders) {
+function editOrder(orders, products) {
+  let orderId = parseInt(prompt("Ingrese el ID de la orden a editar: "));
 
-    printOrders(orders)
+  let orderToEdit = orders.find(order => order.id === orderId);
+
+  if (!orderToEdit) {
+    alert(`La orden con ID '${orderId}' no fue encontrada.`);
+    return;
+  }
+
+  let totalOrden = 0;
+  let productosOrden = [];
+
+  while (true) {
+    let productName = prompt("Ingrese el nombre del producto a agregar o modificar en la orden (o escriba 'salir' para terminar): ");
+    if (productName.toLowerCase() === 'salir') break;
+
+    let product = products.find(prod => prod.producto.toLowerCase() === productName.toLowerCase());
+
+    if (!product) {
+      alert("Producto no encontrado. Intente nuevamente.");
+      continue;
+    }
+
+    let cantidad = parseInt(prompt(`Ingrese la cantidad de ${productName}: `));
+
+    if (cantidad > product.cantidad) {
+      alert(`Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`);
+      continue;
+    }
+
+    let totalProducto = product.precio * cantidad;
+    totalOrden += totalProducto;
+
+    let productoEnOrden = {
+      id: product.id,
+      nombre: product.producto,
+      cantidad: cantidad,
+      total: totalProducto
+    };
+
+    product.cantidad -= cantidad;
+
+    productosOrden.push(productoEnOrden);
+  }
+
+  orderToEdit.productos = productosOrden;
+  orderToEdit.total = totalOrden;
+
+  alert("Orden editada con éxito");
+}
+
+  function deleteOrder(items) {
+
+    printOrders(items)
 
     let orderId = parseInt(prompt("Ingrese el ID de la orden a eliminar: "));
   
-    let index = orders.findIndex(order => order.id === orderId);
+    let index = items.findIndex(item => item.id === orderId);
   
     if (index !== -1) {
-      orders.splice(index, 1);
+      items.splice(index, 1);
       alert("Orden eliminada con éxito.");
     } else {
       alert("Orden no encontrada.");
