@@ -27,9 +27,7 @@ let clients = [
     id: 2,
     cliente: "sushi seven",
   },
-  { id: 3, 
-    cliente: "parrillaje",
-  },
+  { id: 3, cliente: "parrillaje" },
 ];
 let orders = [
   {
@@ -68,55 +66,72 @@ const SUB_MENU_OPTIONS = {
   EDIT: "3",
   DELETE: "4",
   BACK: "5",
+};
+
+
+// Selección de elementos del DOM
+const loginContainer = document.querySelector(".login-container");
+const adminPanel = document.getElementById("admin-panel");
+const panelContent = document.getElementById("panel-content");
+
+// Manejar el evento de inicio de sesión
+document.getElementById("login-form").addEventListener("submit", login);
+
+function login(event) {
+  event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+  // Obtener valores ingresados por el usuario
+  const logUsr = document.getElementById("username").value;
+  const logPass = document.getElementById("password").value;
+
+  // Verificar credenciales
+  if (logUsr === user && logPass === pass) {
+    alert("Inicio de sesión exitoso");
+
+    // Mostrar el panel de administración y ocultar el formulario
+    loginContainer.style.display = "none";
+    adminPanel.style.display = "block";
+  } else {
+    // Mostrar mensaje de error en la página
+    const errorMessage = document.getElementById("error-message");
+    errorMessage.textContent =
+      "Usuario o contraseña incorrectos. Inténtalo de nuevo.";
+  }
 }
 
-login();
+// Manejar las opciones del panel
+document.getElementById("products-btn").addEventListener("click", () => {
+  panelContent.innerHTML = `
+    <h3>Gestión de Productos</h3>
+    <p>Aquí puedes agregar, editar o eliminar productos.</p>
+    <button onclick="addProduct()">Agregar Producto</button>
+  `;
+});
 
-function login() {
-  let flg;
-  do {
-    let logUsr = prompt("Ingrese su nombre de ususario: ");
-    alert(
-      "Por motivos de seguridad, la contraseña no se mostrará en pantalla. Escríbala de memoria. (Prompt no permite ocultar los cacarteres de su campo de entrada como una contraseña)"
-    );
-    let logPass = prompt("Ingrese su contraseña: ");
-    if (logUsr === user && logPass === pass) {
-      flg = 1;
-      alert("Inicio de sesión exitoso");
-      mainMenu();
-    } else {
-      alert("Vuelva a intentarlo");
-    }
-  } while (flg !== 1);
-}
+document.getElementById("clients-btn").addEventListener("click", () => {
+  panelContent.innerHTML = `
+    <h3>Gestión de Clientes</h3>
+    <p>Aquí puedes gestionar tu lista de clientes.</p>
+    <button onclick="addClient()">Agregar Cliente</button>
+  `;
+});
 
-function mainMenu() {
-  let opt;
-  do {
-    alert(
-      `Elija una opción:\n${MAIN_MENU_OPTIONS.PRODUCTS}.- Productos\n${MAIN_MENU_OPTIONS.CLIENTS}.- Clientes\n${MAIN_MENU_OPTIONS.ORDERS}.- Ordenes\n${MAIN_MENU_OPTIONS.EXIT}.- Salir`
-    );
+document.getElementById("orders-btn").addEventListener("click", () => {
+  panelContent.innerHTML = `
+    <h3>Gestión de Órdenes</h3>
+    <p>Aquí puedes ver y gestionar órdenes pendientes.</p>
+    <button onclick="viewOrders()">Ver Órdenes</button>
+  `;
+});
 
-    opt = prompt("Ingrese una opción: ");
-    switch (opt) {
-      case MAIN_MENU_OPTIONS.PRODUCTS:
-        productsMenu();
-        break;
-      case MAIN_MENU_OPTIONS.CLIENTS:
-        clientsMenu();
-        break;
-      case MAIN_MENU_OPTIONS.ORDERS:
-        ordersMenu();
-        break;
-      case MAIN_MENU_OPTIONS.EXIT:
-        alert("Nos vemos pronto");
-        return 0;
-      default:
-        alert("Opción no válida");
-        break;
-    }
-  } while (opt !== MAIN_MENU_OPTIONS.EXIT);
-}
+
+document.getElementById("logout-btn").addEventListener("click", () => {
+  // Reiniciar el flujo: volver al formulario de inicio de sesión
+  adminPanel.style.display = "none";
+  loginContainer.style.display = "block";
+  panelContent.textContent = ""; // Limpiar contenido del panel
+});
+
 
 function productsMenu() {
   let opt;
@@ -179,17 +194,19 @@ function clientsMenu() {
 function ordersMenu() {
   let opt;
   do {
-    alert(`Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar ordenes\n${SUB_MENU_OPTIONS.ADD}.- Agregar orden\n${SUB_MENU_OPTIONS.EDIT}.- Editar orden\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar orden\n${SUB_MENU_OPTIONS.BACK}.- Regresar`);
+    alert(
+      `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar ordenes\n${SUB_MENU_OPTIONS.ADD}.- Agregar orden\n${SUB_MENU_OPTIONS.EDIT}.- Editar orden\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar orden\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
+    );
     opt = prompt("Ingrese una opción: ");
     switch (opt) {
       case SUB_MENU_OPTIONS.PRINT:
         printOrders(orders);
         break;
       case SUB_MENU_OPTIONS.ADD:
-        addOrder(orders,products);
+        addOrder(orders, products);
         break;
       case SUB_MENU_OPTIONS.EDIT:
-        editOrder(orders,products);
+        editOrder(orders, products);
         break;
       case SUB_MENU_OPTIONS.DELETE:
         deleteOrder(orders);
@@ -281,9 +298,18 @@ function editProduct(items) {
     return;
   }
 
-  let newProductName = prompt(`Ingrese el nuevo nombre del producto (${productToEdit.producto}): `, productToEdit.producto);
-  let newQty = prompt(`Ingrese la nueva cantidad (${productToEdit.cantidad}): `, productToEdit.cantidad);
-  let newPrice = prompt(`Ingrese el nuevo precio (${productToEdit.precio}): `, productToEdit.precio);
+  let newProductName = prompt(
+    `Ingrese el nuevo nombre del producto (${productToEdit.producto}): `,
+    productToEdit.producto
+  );
+  let newQty = prompt(
+    `Ingrese la nueva cantidad (${productToEdit.cantidad}): `,
+    productToEdit.cantidad
+  );
+  let newPrice = prompt(
+    `Ingrese el nuevo precio (${productToEdit.precio}): `,
+    productToEdit.precio
+  );
 
   productToEdit.producto = newProductName || productToEdit.producto;
   productToEdit.cantidad = newQty || productToEdit.cantidad;
@@ -293,9 +319,8 @@ function editProduct(items) {
 }
 
 function deleteProduct(items) {
+  printProdcs(items);
 
-  printProdcs(items)
-  
   let productD = prompt("Ingrese el producto a eliminar: ");
 
   let i = items.findIndex(
@@ -311,28 +336,29 @@ function deleteProduct(items) {
 }
 
 function addClient(items) {
-    let newC = prompt("Ingrese nombre del cliente a agregar: ");
-  
-    const exists = items.some(
-      (item) => item.cliente.toLowerCase() === newC.toLowerCase()
-    );
-    if (exists) {
-      alert(`El cliente '${newC}' ya existe.`);
-      return;
-    }
-  
-    const maxId = items.length > 0 ? Math.max(...items.map((item) => item.id)) : 0;
-    const newId = maxId + 1;
-  
-    const newClient = { id: newId, cliente: newC };
-    items.push(newClient);
-  
-    alert("Cliente agregado con éxito");
+  let newC = prompt("Ingrese nombre del cliente a agregar: ");
+
+  const exists = items.some(
+    (item) => item.cliente.toLowerCase() === newC.toLowerCase()
+  );
+  if (exists) {
+    alert(`El cliente '${newC}' ya existe.`);
+    return;
+  }
+
+  const maxId =
+    items.length > 0 ? Math.max(...items.map((item) => item.id)) : 0;
+  const newId = maxId + 1;
+
+  const newClient = { id: newId, cliente: newC };
+  items.push(newClient);
+
+  alert("Cliente agregado con éxito");
 }
-  
+
 function editClient(items) {
   let clientName = prompt("Ingrese el nombre del cliente a editar: ");
-  
+
   const clientToEdit = items.find(
     (item) => item.cliente.toLowerCase() === clientName.toLowerCase()
   );
@@ -342,7 +368,9 @@ function editClient(items) {
     return;
   }
 
-  let newClientName = prompt(`Ingrese el nuevo nombre para el cliente '${clientToEdit.cliente}' (o presione Enter para mantener el nombre actual):`);
+  let newClientName = prompt(
+    `Ingrese el nuevo nombre para el cliente '${clientToEdit.cliente}' (o presione Enter para mantener el nombre actual):`
+  );
 
   clientToEdit.cliente = newClientName || clientToEdit.cliente;
 
@@ -365,77 +393,22 @@ function deleteClient(items) {
 }
 
 function addOrder(orders, products) {
-    let idCliente = parseInt(prompt("Ingrese el ID del cliente para esta orden: "));
-  
-    let productosOrden = [];
-    let totalOrden = 0;
-  
-    while (true) {
-      let productName = prompt("Ingrese el nombre del producto (o escriba 'salir' para terminar): ");
-      if (productName.toLowerCase() === 'salir') break;
-  
-      let product = products.find(prod => prod.producto.toLowerCase() === productName.toLowerCase());
-  
-      if (!product) {
-        alert("Producto no encontrado. Intente nuevamente.");
-        continue;
-      }
-  
-      let cantidad = parseInt(prompt(`Ingrese la cantidad de ${productName}: `));
-  
-      if (cantidad > product.cantidad) {
-        alert(`Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`);
-        continue;
-      }
-  
-      let totalProducto = product.precio * cantidad;
-      totalOrden += totalProducto;
-  
-      let productoEnOrden = {
-        id: product.id,
-        nombre: product.producto,
-        cantidad: cantidad,
-        total: totalProducto
-      };
-  
-      product.cantidad -= cantidad;
-  
-      productosOrden.push(productoEnOrden);
-    }
-  
-    const maxId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) : 1;
-    const newId = maxId + 1;
-  
-    const newOrder = {
-      id: newId,
-      idCliente: idCliente,
-      productos: productosOrden,
-      total: totalOrden
-    };
-  
-    orders.push(newOrder);
-  
-    alert("Orden agregada con éxito");
-}
+  let idCliente = parseInt(
+    prompt("Ingrese el ID del cliente para esta orden: ")
+  );
 
-function editOrder(orders, products) {
-  let orderId = parseInt(prompt("Ingrese el ID de la orden a editar: "));
-
-  let orderToEdit = orders.find(order => order.id === orderId);
-
-  if (!orderToEdit) {
-    alert(`La orden con ID '${orderId}' no fue encontrada.`);
-    return;
-  }
-
-  let totalOrden = 0;
   let productosOrden = [];
+  let totalOrden = 0;
 
   while (true) {
-    let productName = prompt("Ingrese el nombre del producto a agregar o modificar en la orden (o escriba 'salir' para terminar): ");
-    if (productName.toLowerCase() === 'salir') break;
+    let productName = prompt(
+      "Ingrese el nombre del producto (o escriba 'salir' para terminar): "
+    );
+    if (productName.toLowerCase() === "salir") break;
 
-    let product = products.find(prod => prod.producto.toLowerCase() === productName.toLowerCase());
+    let product = products.find(
+      (prod) => prod.producto.toLowerCase() === productName.toLowerCase()
+    );
 
     if (!product) {
       alert("Producto no encontrado. Intente nuevamente.");
@@ -445,7 +418,9 @@ function editOrder(orders, products) {
     let cantidad = parseInt(prompt(`Ingrese la cantidad de ${productName}: `));
 
     if (cantidad > product.cantidad) {
-      alert(`Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`);
+      alert(
+        `Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`
+      );
       continue;
     }
 
@@ -456,7 +431,74 @@ function editOrder(orders, products) {
       id: product.id,
       nombre: product.producto,
       cantidad: cantidad,
-      total: totalProducto
+      total: totalProducto,
+    };
+
+    product.cantidad -= cantidad;
+
+    productosOrden.push(productoEnOrden);
+  }
+
+  const maxId = orders.length > 0 ? Math.max(...orders.map((o) => o.id)) : 1;
+  const newId = maxId + 1;
+
+  const newOrder = {
+    id: newId,
+    idCliente: idCliente,
+    productos: productosOrden,
+    total: totalOrden,
+  };
+
+  orders.push(newOrder);
+
+  alert("Orden agregada con éxito");
+}
+
+function editOrder(orders, products) {
+  let orderId = parseInt(prompt("Ingrese el ID de la orden a editar: "));
+
+  let orderToEdit = orders.find((order) => order.id === orderId);
+
+  if (!orderToEdit) {
+    alert(`La orden con ID '${orderId}' no fue encontrada.`);
+    return;
+  }
+
+  let totalOrden = 0;
+  let productosOrden = [];
+
+  while (true) {
+    let productName = prompt(
+      "Ingrese el nombre del producto a agregar o modificar en la orden (o escriba 'salir' para terminar): "
+    );
+    if (productName.toLowerCase() === "salir") break;
+
+    let product = products.find(
+      (prod) => prod.producto.toLowerCase() === productName.toLowerCase()
+    );
+
+    if (!product) {
+      alert("Producto no encontrado. Intente nuevamente.");
+      continue;
+    }
+
+    let cantidad = parseInt(prompt(`Ingrese la cantidad de ${productName}: `));
+
+    if (cantidad > product.cantidad) {
+      alert(
+        `Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`
+      );
+      continue;
+    }
+
+    let totalProducto = product.precio * cantidad;
+    totalOrden += totalProducto;
+
+    let productoEnOrden = {
+      id: product.id,
+      nombre: product.producto,
+      cantidad: cantidad,
+      total: totalProducto,
     };
 
     product.cantidad -= cantidad;
@@ -470,19 +512,17 @@ function editOrder(orders, products) {
   alert("Orden editada con éxito");
 }
 
-  function deleteOrder(items) {
+function deleteOrder(items) {
+  printOrders(items);
 
-    printOrders(items)
+  let orderId = parseInt(prompt("Ingrese el ID de la orden a eliminar: "));
 
-    let orderId = parseInt(prompt("Ingrese el ID de la orden a eliminar: "));
-  
-    let index = items.findIndex(item => item.id === orderId);
-  
-    if (index !== -1) {
-      items.splice(index, 1);
-      alert("Orden eliminada con éxito.");
-    } else {
-      alert("Orden no encontrada.");
-    }
+  let index = items.findIndex((item) => item.id === orderId);
+
+  if (index !== -1) {
+    items.splice(index, 1);
+    alert("Orden eliminada con éxito.");
+  } else {
+    alert("Orden no encontrada.");
+  }
 }
-  
