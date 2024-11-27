@@ -68,7 +68,6 @@ const SUB_MENU_OPTIONS = {
   BACK: "5",
 };
 
-
 // Selección de elementos del DOM
 const loginContainer = document.querySelector(".login-container");
 const adminPanel = document.getElementById("admin-panel");
@@ -91,8 +90,13 @@ function login(event) {
     // Mostrar el panel de administración y ocultar el formulario
     loginContainer.style.display = "none";
     adminPanel.style.display = "block";
+
+    // Mostrar contenido inicial en el área dinámica
+    document.getElementById("content").innerHTML = `
+      <h3>Bienvenido</h3>
+      <p>Selecciona una opción del menú para comenzar.</p>
+    `;
   } else {
-    // Mostrar mensaje de error en la página
     const errorMessage = document.getElementById("error-message");
     errorMessage.textContent =
       "Usuario o contraseña incorrectos. Inténtalo de nuevo.";
@@ -101,134 +105,145 @@ function login(event) {
 
 // Manejar las opciones del panel
 document.getElementById("products-btn").addEventListener("click", () => {
-  panelContent.innerHTML = `
+  document.getElementById("content").innerHTML = `
     <h3>Gestión de Productos</h3>
     <p>Aquí puedes agregar, editar o eliminar productos.</p>
-    <button onclick="addProduct()">Agregar Producto</button>
+    <input 
+      type="text" 
+      id="search-bar" 
+      placeholder="Buscar producto..." 
+      style="margin-bottom: 10px; width: 20%; padding: 5px;"
+    />
+    <div id="product-table"></div>
+    <button id="add-product-btn">Añadir</button>
   `;
+
+  // Renderizar la tabla de productos
+  printProdcs(products);
+
+  // Evento para el botón de agregar producto
+  document.getElementById("add-product-btn").addEventListener("click", () => {
+    showAddProductForm();
+  });
+
+  // Evento para la barra de búsqueda
+  document.getElementById("search-bar").addEventListener("input", (event) => {
+    const query = event.target.value.toLowerCase();
+    const filteredProducts = products.filter((product) =>
+      product.producto.toLowerCase().includes(query)
+    );
+    printProdcs(filteredProducts);
+  });
 });
 
+// Otros botones del menú
 document.getElementById("clients-btn").addEventListener("click", () => {
-  panelContent.innerHTML = `
+  document.getElementById("content").innerHTML = `
     <h3>Gestión de Clientes</h3>
-    <p>Aquí puedes gestionar tu lista de clientes.</p>
-    <button onclick="addClient()">Agregar Cliente</button>
+    <p>Aquí puedes administrar la información de los clientes.</p>
   `;
 });
 
 document.getElementById("orders-btn").addEventListener("click", () => {
-  panelContent.innerHTML = `
+  document.getElementById("content").innerHTML = `
     <h3>Gestión de Órdenes</h3>
-    <p>Aquí puedes ver y gestionar órdenes pendientes.</p>
-    <button onclick="viewOrders()">Ver Órdenes</button>
+    <p>Aquí puedes gestionar las órdenes de los clientes.</p>
   `;
 });
 
-
 document.getElementById("logout-btn").addEventListener("click", () => {
-  // Reiniciar el flujo: volver al formulario de inicio de sesión
+  alert("Cerrando sesión...");
   adminPanel.style.display = "none";
   loginContainer.style.display = "block";
-  panelContent.textContent = ""; // Limpiar contenido del panel
 });
 
 
-function productsMenu() {
-  let opt;
-  do {
-    alert(
-      `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar productos\n${SUB_MENU_OPTIONS.ADD}.- Añadir productos\n${SUB_MENU_OPTIONS.EDIT}.- Editar producto\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar producto\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
-    );
-    opt = prompt("Ingrese una opción: ");
-    switch (opt) {
-      case SUB_MENU_OPTIONS.PRINT:
-        printProdcs(products);
-        break;
-      case SUB_MENU_OPTIONS.ADD:
-        addProduct(products);
-        break;
-      case SUB_MENU_OPTIONS.EDIT:
-        editProduct(products);
-        break;
-      case SUB_MENU_OPTIONS.DELETE:
-        deleteProduct(products);
-        break;
-      case SUB_MENU_OPTIONS.BACK:
-        return 0;
-      default:
-        alert("Opción no valida");
-        break;
-    }
-  } while (opt !== SUB_MENU_OPTIONS.BACK);
-}
+// function productsMenu() {
+//   let opt;
+//   do {
+//     alert(
+//       `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar productos\n${SUB_MENU_OPTIONS.ADD}.- Añadir productos\n${SUB_MENU_OPTIONS.EDIT}.- Editar producto\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar producto\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
+//     );
+//     opt = prompt("Ingrese una opción: ");
+//     switch (opt) {
+//       case SUB_MENU_OPTIONS.PRINT:
+//         printProdcs(products);
+//         break;
+//       case SUB_MENU_OPTIONS.ADD:
+//         addProduct(products);
+//         break;
+//       case SUB_MENU_OPTIONS.EDIT:
+//         editProduct(products);
+//         break;
+//       case SUB_MENU_OPTIONS.DELETE:
+//         deleteProduct(products);
+//         break;
+//       case SUB_MENU_OPTIONS.BACK:
+//         return 0;
+//       default:
+//         alert("Opción no valida");
+//         break;
+//     }
+//   } while (opt !== SUB_MENU_OPTIONS.BACK);
+// }
 
-function clientsMenu() {
-  let opt;
-  do {
-    alert(
-      `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar clientes\n${SUB_MENU_OPTIONS.ADD}.- Añadir cliente\n${SUB_MENU_OPTIONS.EDIT}.- Editar cliente\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar cliente\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
-    );
-    opt = prompt("Ingrese una opción: ");
-    switch (opt) {
-      case SUB_MENU_OPTIONS.PRINT:
-        printClients(clients);
-        break;
-      case SUB_MENU_OPTIONS.ADD:
-        addClient(clients);
-        break;
-      case SUB_MENU_OPTIONS.EDIT:
-        editClient(clients);
-        break;
-      case SUB_MENU_OPTIONS.DELETE:
-        deleteClient(clients);
-        break;
-      case SUB_MENU_OPTIONS.BACK:
-        return 0;
-      default:
-        alert("Opción no valida");
-        break;
-    }
-  } while (opt !== SUB_MENU_OPTIONS.BACK);
-}
+// function clientsMenu() {
+//   let opt;
+//   do {
+//     alert(
+//       `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar clientes\n${SUB_MENU_OPTIONS.ADD}.- Añadir cliente\n${SUB_MENU_OPTIONS.EDIT}.- Editar cliente\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar cliente\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
+//     );
+//     opt = prompt("Ingrese una opción: ");
+//     switch (opt) {
+//       case SUB_MENU_OPTIONS.PRINT:
+//         printClients(clients);
+//         break;
+//       case SUB_MENU_OPTIONS.ADD:
+//         addClient(clients);
+//         break;
+//       case SUB_MENU_OPTIONS.EDIT:
+//         editClient(clients);
+//         break;
+//       case SUB_MENU_OPTIONS.DELETE:
+//         deleteClient(clients);
+//         break;
+//       case SUB_MENU_OPTIONS.BACK:
+//         return 0;
+//       default:
+//         alert("Opción no valida");
+//         break;
+//     }
+//   } while (opt !== SUB_MENU_OPTIONS.BACK);
+// }
 
-function ordersMenu() {
-  let opt;
-  do {
-    alert(
-      `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar ordenes\n${SUB_MENU_OPTIONS.ADD}.- Agregar orden\n${SUB_MENU_OPTIONS.EDIT}.- Editar orden\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar orden\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
-    );
-    opt = prompt("Ingrese una opción: ");
-    switch (opt) {
-      case SUB_MENU_OPTIONS.PRINT:
-        printOrders(orders);
-        break;
-      case SUB_MENU_OPTIONS.ADD:
-        addOrder(orders, products);
-        break;
-      case SUB_MENU_OPTIONS.EDIT:
-        editOrder(orders, products);
-        break;
-      case SUB_MENU_OPTIONS.DELETE:
-        deleteOrder(orders);
-        break;
-      case SUB_MENU_OPTIONS.BACK:
-        return 0;
-      default:
-        alert("Opción no valida");
-        break;
-    }
-  } while (opt !== SUB_MENU_OPTIONS.BACK);
-}
-
-function printProdcs(items) {
-  let msg = [];
-  for (let item of items) {
-    msg.push(
-      `ID: ${item.id} - Producto: ${item.producto} - Cantidad en inventario: ${item.cantidad} Kg - Precio: ${item.precio} MXN`
-    );
-  }
-  alert(msg.join("\n"));
-}
+// function ordersMenu() {
+//   let opt;
+//   do {
+//     alert(
+//       `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar ordenes\n${SUB_MENU_OPTIONS.ADD}.- Agregar orden\n${SUB_MENU_OPTIONS.EDIT}.- Editar orden\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar orden\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
+//     );
+//     opt = prompt("Ingrese una opción: ");
+//     switch (opt) {
+//       case SUB_MENU_OPTIONS.PRINT:
+//         printOrders(orders);
+//         break;
+//       case SUB_MENU_OPTIONS.ADD:
+//         addOrder(orders, products);
+//         break;
+//       case SUB_MENU_OPTIONS.EDIT:
+//         editOrder(orders, products);
+//         break;
+//       case SUB_MENU_OPTIONS.DELETE:
+//         deleteOrder(orders);
+//         break;
+//       case SUB_MENU_OPTIONS.BACK:
+//         return 0;
+//       default:
+//         alert("Opción no valida");
+//         break;
+//     }
+//   } while (opt !== SUB_MENU_OPTIONS.BACK);
+// }
 
 function printClients(items) {
   let msg = [];
@@ -259,21 +274,122 @@ function printOrders(items) {
   alert(msg.join("\n"));
 }
 
-function addProduct(items) {
-  let product = prompt("Ingrese el producto a agregar: ");
-  const exists = items.some(
+function renderTableView() {
+  // Cambiar el contenido del panel para mostrar la tabla y el botón de añadir
+  document.getElementById("panel-content").innerHTML = `
+    <h3>Gestión de Productos</h3>
+    <p>Aquí puedes agregar, editar o eliminar productos.</p>
+    <div id="product-table"></div>
+    <button id="add-product-btn">Añadir</button>
+  `;
+
+  // Volver a renderizar la tabla de productos
+  printProdcs(products);
+
+  // Vincular de nuevo el evento de "Añadir"
+  document.getElementById("add-product-btn").addEventListener("click", () => {
+    showAddProductForm();
+  });
+}
+
+function printProdcs(items) {
+  const tableContent = items
+    .map(
+      (item) => `
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.producto}</td>
+          <td>${item.cantidad}</td>
+          <td>${item.precio}</td>
+          <td>
+            <button onclick="editProduct(${item.id})">Editar</button>
+            <button onclick="deleteProduct(${item.id})">Borrar</button>
+          </td>
+        </tr>
+      `
+    )
+    .join(""); // Combina todas las filas en una sola cadena
+
+  const tableHTML = `
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableContent}
+      </tbody>
+    </table>
+  `;
+
+  // Insertar la tabla en el div con ID "product-table"
+  document.getElementById("product-table").innerHTML = tableHTML;
+}
+
+function showAddProductForm() {
+  // Cambiar el contenido para mostrar el formulario de añadir producto
+  document.getElementById("panel-content").innerHTML = `
+    <h3>Agregar Producto</h3>
+    <form id="add-product-form">
+      <label for="product-name">Producto:</label>
+      <input type="text" id="product-name" required />
+      <label for="product-quantity">Cantidad:</label>
+      <input type="number" id="product-quantity" required />
+      <label for="product-price">Precio:</label>
+      <input type="number" id="product-price" required />
+      <button type="submit">Añadir Producto</button>
+    </form>
+    <button id="cancel-add-btn">Cancelar</button>
+  `;
+
+  // Evento para cancelar el formulario y volver a la vista de la tabla
+  document.getElementById("cancel-add-btn").addEventListener("click", () => {
+    // Volver a mostrar la tabla de productos
+    renderTableView();
+  });
+
+  // Evento para manejar el envío del formulario
+  document
+    .getElementById("add-product-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault(); // Evitar recarga de página
+
+      // Capturar los datos del formulario
+      const productName = document.getElementById("product-name").value;
+      const productQuantity = parseInt(
+        document.getElementById("product-quantity").value
+      );
+      const productPrice = parseFloat(
+        document.getElementById("product-price").value
+      );
+
+      // Llamar a la función addProduct con los valores capturados
+      addProduct(productName, productQuantity, productPrice);
+    });
+}
+
+function addProduct(product, qty, price) {
+  // Verificar si el producto ya existe
+  const exists = products.some(
     (item) => item.producto.toLowerCase() === product.toLowerCase()
   );
+
   if (exists) {
     alert(`El producto '${product}' ya existe.`);
-    return 0;
+    return;
   }
-  let qty = prompt("Ingrese la cantidad de producto a agregar: ");
-  let price = prompt("Ingrese el precio del producto: ");
 
-  const maxId = items.length > 0 ? Math.max(...items.map((p) => p.id)) : 1200;
+  // Obtener el ID del nuevo producto
+  const maxId =
+    products.length > 0 ? Math.max(...products.map((p) => p.id)) : 1200;
   const newId = maxId + 1;
 
+  // Crear un nuevo objeto de producto
   const newProduct = {
     id: newId,
     producto: product,
@@ -281,55 +397,80 @@ function addProduct(items) {
     precio: price,
   };
 
-  items.push(newProduct);
+  // Agregar el producto al array
+  products.push(newProduct);
 
   alert("Producto agregado con éxito");
+
+  // Volver a mostrar la tabla con el nuevo producto
+  renderTableView();
 }
 
-function editProduct(items) {
-  let product = prompt("Ingrese el nombre del producto a editar: ");
-
-  let productToEdit = items.find(
-    (item) => item.producto.toLowerCase() === product.toLowerCase()
-  );
+function editProduct(productId) {
+  // Buscar el producto por ID
+  const productToEdit = products.find((item) => item.id === productId);
 
   if (!productToEdit) {
-    alert(`El producto '${product}' no se encontró.`);
+    alert("Producto no encontrado.");
     return;
   }
 
-  let newProductName = prompt(
-    `Ingrese el nuevo nombre del producto (${productToEdit.producto}): `,
-    productToEdit.producto
-  );
-  let newQty = prompt(
-    `Ingrese la nueva cantidad (${productToEdit.cantidad}): `,
-    productToEdit.cantidad
-  );
-  let newPrice = prompt(
-    `Ingrese el nuevo precio (${productToEdit.precio}): `,
-    productToEdit.precio
-  );
+  // Cambiar el contenido del panel para mostrar el formulario de editar
+  document.getElementById("panel-content").innerHTML = `
+    <h3>Editar Producto</h3>
+    <form id="edit-product-form">
+      <label for="edit-product-name">Producto:</label>
+      <input type="text" id="edit-product-name" value="${productToEdit.producto}" required />
+      <label for="edit-product-quantity">Cantidad:</label>
+      <input type="number" id="edit-product-quantity" value="${productToEdit.cantidad}" required />
+      <label for="edit-product-price">Precio:</label>
+      <input type="number" id="edit-product-price" value="${productToEdit.precio}" required />
+      <button type="submit">Guardar Cambios</button>
+    </form>
+    <button id="cancel-edit-btn">Cancelar</button>
+  `;
 
-  productToEdit.producto = newProductName || productToEdit.producto;
-  productToEdit.cantidad = newQty || productToEdit.cantidad;
-  productToEdit.precio = newPrice || productToEdit.precio;
+  // Evento para cancelar la edición y volver a la vista de la tabla
+  document.getElementById("cancel-edit-btn").addEventListener("click", () => {
+    renderTableView();
+  });
 
-  alert("Producto editado con éxito");
+  // Evento para manejar el envío del formulario de edición
+  document
+    .getElementById("edit-product-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault(); // Evitar recarga de página
+
+      // Capturar los nuevos valores del formulario
+      const editedProductName =
+        document.getElementById("edit-product-name").value;
+      const editedProductQuantity = parseInt(
+        document.getElementById("edit-product-quantity").value
+      );
+      const editedProductPrice = parseFloat(
+        document.getElementById("edit-product-price").value
+      );
+
+      // Actualizar el producto con los nuevos valores
+      productToEdit.producto = editedProductName;
+      productToEdit.cantidad = editedProductQuantity;
+      productToEdit.precio = editedProductPrice;
+
+      alert("Producto editado con éxito");
+
+      // Volver a mostrar la tabla con los cambios
+      renderTableView();
+    });
 }
 
-function deleteProduct(items) {
-  printProdcs(items);
+function deleteProduct(productId) {
+  // Buscar el producto por ID
+  const index = products.findIndex((item) => item.id === productId);
 
-  let productD = prompt("Ingrese el producto a eliminar: ");
-
-  let i = items.findIndex(
-    (item) => item.producto.toLowerCase() === productD.toLowerCase()
-  );
-
-  if (i !== -1) {
-    items.splice(i, 1);
+  if (index !== -1) {
+    products.splice(index, 1); // Eliminar el producto del array
     alert("Producto eliminado con éxito");
+    renderTableView(); // Volver a renderizar la tabla
   } else {
     alert("Producto no encontrado.");
   }
