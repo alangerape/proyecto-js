@@ -659,6 +659,7 @@ function editOrder(orderId) {
   let productosOrden = [...orderToEdit.productos];
   let totalOrden = orderToEdit.total;
 
+  // Renderizar formulario de edición
   document.getElementById("content").innerHTML = `
     <h3>Editar Orden</h3>
     <form id="edit-order-form">
@@ -667,6 +668,18 @@ function editOrder(orderId) {
       
       <div id="edit-product-list">
         <h4>Productos:</h4>
+        ${productosOrden
+          .map(
+            (product, index) => `
+              <div class="product-item" data-index="${index}">
+                <input type="text" value="${product.nombre}" class="product-name" required />
+                <input type="number" value="${product.cantidad}" class="product-quantity" required />
+                <span>Total: $${product.total}</span>
+                <button type="button" class="remove-product-btn">Eliminar</button>
+              </div>
+            `
+          )
+          .join("")}
         <button type="button" id="add-product-edit">Añadir/Modificar Producto</button>
       </div>
       
@@ -675,6 +688,7 @@ function editOrder(orderId) {
     </form>
   `;
 
+  // Evento para añadir o modificar productos
   document.getElementById("add-product-edit").addEventListener("click", () => {
     const productName = prompt("Nombre del producto:");
     const cantidad = parseInt(prompt("Cantidad:"));
@@ -687,11 +701,11 @@ function editOrder(orderId) {
       return;
     }
 
-    product.cantidad -= cantidad;
-    const existing = productosOrden.find((p) => p.id === product.id);
-    if (existing) {
-      existing.cantidad += cantidad;
-      existing.total += product.precio * cantidad;
+    // Actualizar productos en la orden
+    const existingProduct = productosOrden.find((p) => p.id === product.id);
+    if (existingProduct) {
+      existingProduct.cantidad += cantidad;
+      existingProduct.total = existingProduct.cantidad * product.precio;
     } else {
       productosOrden.push({
         id: product.id,
@@ -701,16 +715,53 @@ function editOrder(orderId) {
       });
     }
 
+    // Recalcular el total de la orden
     totalOrden = productosOrden.reduce((sum, p) => sum + p.total, 0);
-    alert("Producto actualizado.");
+    alert("Producto añadido/actualizado.");
+    renderProductList(); // Actualizar la lista de productos
   });
 
+  // Función para renderizar la lista de productos
+  function renderProductList() {
+    const productListContainer = document.getElementById("edit-product-list");
+    const productItems = productosOrden
+      .map(
+        (product, index) => `
+          <div class="product-item" data-index="${index}">
+            <input type="text" value="${product.nombre}" class="product-name" required />
+            <input type="number" value="${product.cantidad}" class="product-quantity" required />
+            <span>Total: $${product.total}</span>
+            <button type="button" class="remove-product-btn">Eliminar</button>
+          </div>
+        `
+      )
+      .join("");
+    productListContainer.innerHTML = `
+      <h4>Productos:</h4>
+      ${productItems}
+      <button type="button" id="add-product-edit">Añadir/Modificar Producto</button>
+    `;
+    attachRemoveEventListeners(); // Volver a añadir los eventos de eliminación
+  }
+
+  // Evento para eliminar productos
+  function attachRemoveEventListeners() {
+    document.querySelectorAll(".remove-product-btn").forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const productItem = e.target.closest(".product-item");
+        const index = parseInt(productItem.dataset.index);
+        productosOrden.splice(index, 1); // Eliminar producto del array
+        renderProductList(); // Volver a renderizar la lista
+        totalOrden = productosOrden.reduce((sum, p) => sum + p.total, 0); // Recalcular el total
+      });
+    });
+  }
+
+  // Evento para guardar los cambios en la orden
   document.getElementById("edit-order-form").addEventListener("submit", (event) => {
     event.preventDefault();
 
-    orderToEdit.idCliente = parseInt(
-      document.getElementById("edit-client-id").value
-    );
+    orderToEdit.idCliente = parseInt(document.getElementById("edit-client-id").value);
     orderToEdit.productos = productosOrden;
     orderToEdit.total = totalOrden;
 
@@ -718,12 +769,15 @@ function editOrder(orderId) {
     document.getElementById("orders-btn").click();
   });
 
-  document
-    .getElementById("cancel-edit-order")
-    .addEventListener("click", () => {
-      document.getElementById("orders-btn").click();
-    });
+  // Evento para cancelar la edición
+  document.getElementById("cancel-edit-order").addEventListener("click", () => {
+    document.getElementById("orders-btn").click();
+  });
+
+  // Inicializar la lista de productos
+  renderProductList();
 }
+
 
 // Función para borrar una orden
 function deleteOrder(orderId) {
