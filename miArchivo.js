@@ -136,12 +136,39 @@ document.getElementById("products-btn").addEventListener("click", () => {
   });
 });
 
-// Otros botones del menú
+// Mostrar tabla de clientes
 document.getElementById("clients-btn").addEventListener("click", () => {
   document.getElementById("content").innerHTML = `
     <h3>Gestión de Clientes</h3>
-    <p>Aquí puedes administrar la información de los clientes.</p>
+    <p>Aquí puedes agregar, editar o eliminar clientes.</p>
+    <input 
+      type="text" 
+      id="search-bar-clients" 
+      placeholder="Buscar cliente..." 
+      style="margin-bottom: 10px; width: 20%; padding: 5px;"
+    />
+    <div id="client-table"></div>
+    <button id="add-client-btn">Añadir</button>
   `;
+
+  // Renderizar la tabla de clientes
+  printClients(clients);
+
+  // Evento para añadir nuevo cliente
+  document.getElementById("add-client-btn").addEventListener("click", () => {
+    showAddClientForm();
+  });
+
+  // Evento para la barra de búsqueda
+  document
+    .getElementById("search-bar-clients")
+    .addEventListener("input", (event) => {
+      const query = event.target.value.toLowerCase();
+      const filteredClients = clients.filter((client) =>
+        client.cliente.toLowerCase().includes(query)
+      );
+      printClients(filteredClients);
+    });
 });
 
 document.getElementById("orders-btn").addEventListener("click", () => {
@@ -156,123 +183,6 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   adminPanel.style.display = "none";
   loginContainer.style.display = "block";
 });
-
-
-// function productsMenu() {
-//   let opt;
-//   do {
-//     alert(
-//       `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar productos\n${SUB_MENU_OPTIONS.ADD}.- Añadir productos\n${SUB_MENU_OPTIONS.EDIT}.- Editar producto\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar producto\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
-//     );
-//     opt = prompt("Ingrese una opción: ");
-//     switch (opt) {
-//       case SUB_MENU_OPTIONS.PRINT:
-//         printProdcs(products);
-//         break;
-//       case SUB_MENU_OPTIONS.ADD:
-//         addProduct(products);
-//         break;
-//       case SUB_MENU_OPTIONS.EDIT:
-//         editProduct(products);
-//         break;
-//       case SUB_MENU_OPTIONS.DELETE:
-//         deleteProduct(products);
-//         break;
-//       case SUB_MENU_OPTIONS.BACK:
-//         return 0;
-//       default:
-//         alert("Opción no valida");
-//         break;
-//     }
-//   } while (opt !== SUB_MENU_OPTIONS.BACK);
-// }
-
-// function clientsMenu() {
-//   let opt;
-//   do {
-//     alert(
-//       `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar clientes\n${SUB_MENU_OPTIONS.ADD}.- Añadir cliente\n${SUB_MENU_OPTIONS.EDIT}.- Editar cliente\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar cliente\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
-//     );
-//     opt = prompt("Ingrese una opción: ");
-//     switch (opt) {
-//       case SUB_MENU_OPTIONS.PRINT:
-//         printClients(clients);
-//         break;
-//       case SUB_MENU_OPTIONS.ADD:
-//         addClient(clients);
-//         break;
-//       case SUB_MENU_OPTIONS.EDIT:
-//         editClient(clients);
-//         break;
-//       case SUB_MENU_OPTIONS.DELETE:
-//         deleteClient(clients);
-//         break;
-//       case SUB_MENU_OPTIONS.BACK:
-//         return 0;
-//       default:
-//         alert("Opción no valida");
-//         break;
-//     }
-//   } while (opt !== SUB_MENU_OPTIONS.BACK);
-// }
-
-// function ordersMenu() {
-//   let opt;
-//   do {
-//     alert(
-//       `Elija una opción:\n${SUB_MENU_OPTIONS.PRINT}.- Consultar ordenes\n${SUB_MENU_OPTIONS.ADD}.- Agregar orden\n${SUB_MENU_OPTIONS.EDIT}.- Editar orden\n${SUB_MENU_OPTIONS.DELETE}.- Eliminar orden\n${SUB_MENU_OPTIONS.BACK}.- Regresar`
-//     );
-//     opt = prompt("Ingrese una opción: ");
-//     switch (opt) {
-//       case SUB_MENU_OPTIONS.PRINT:
-//         printOrders(orders);
-//         break;
-//       case SUB_MENU_OPTIONS.ADD:
-//         addOrder(orders, products);
-//         break;
-//       case SUB_MENU_OPTIONS.EDIT:
-//         editOrder(orders, products);
-//         break;
-//       case SUB_MENU_OPTIONS.DELETE:
-//         deleteOrder(orders);
-//         break;
-//       case SUB_MENU_OPTIONS.BACK:
-//         return 0;
-//       default:
-//         alert("Opción no valida");
-//         break;
-//     }
-//   } while (opt !== SUB_MENU_OPTIONS.BACK);
-// }
-
-function printClients(items) {
-  let msg = [];
-  for (let item of items) {
-    msg.push(`ID: ${item.id} - Cliente: ${item.cliente}`);
-  }
-  alert(msg.join("\n"));
-}
-
-function printOrders(items) {
-  let msg = [];
-
-  for (let order of items) {
-    msg.push(`Orden ID: ${order.id}`);
-    msg.push(`Cliente ID: ${order.idCliente}`);
-    msg.push("Productos:");
-
-    for (let producto of order.productos) {
-      msg.push(
-        `  -Producto: ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total} MXN`
-      );
-    }
-
-    msg.push(`Total de la orden: $${order.total} MXN`);
-    msg.push("");
-  }
-
-  alert(msg.join("\n"));
-}
 
 function renderTableView() {
   // Cambiar el contenido del panel para mostrar la tabla y el botón de añadir
@@ -476,61 +386,150 @@ function deleteProduct(productId) {
   }
 }
 
-function addClient(items) {
-  let newC = prompt("Ingrese nombre del cliente a agregar: ");
+// Función para renderizar la tabla de clientes
+function printClients(items) {
+  const tableContent = items
+    .map(
+      (item) => `
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.cliente}</td>
+          <td>
+            <button onclick="editClient(${item.id})">Editar</button>
+            <button onclick="deleteClient(${item.id})">Borrar</button>
+          </td>
+        </tr>
+      `
+    )
+    .join("");
 
-  const exists = items.some(
-    (item) => item.cliente.toLowerCase() === newC.toLowerCase()
-  );
-  if (exists) {
-    alert(`El cliente '${newC}' ya existe.`);
-    return;
-  }
+  const tableHTML = `
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableContent}
+      </tbody>
+    </table>
+  `;
 
-  const maxId =
-    items.length > 0 ? Math.max(...items.map((item) => item.id)) : 0;
-  const newId = maxId + 1;
-
-  const newClient = { id: newId, cliente: newC };
-  items.push(newClient);
-
-  alert("Cliente agregado con éxito");
+  document.getElementById("client-table").innerHTML = tableHTML;
 }
 
-function editClient(items) {
-  let clientName = prompt("Ingrese el nombre del cliente a editar: ");
+// Función para mostrar el formulario de agregar cliente
+function showAddClientForm() {
+  document.getElementById("content").innerHTML = `
+    <h3>Agregar Cliente</h3>
+    <form id="add-client-form">
+      <label for="client-name">Nombre del cliente:</label>
+      <input type="text" id="client-name" required />
+      <button type="submit">Guardar</button>
+      <button type="button" id="cancel-add-client">Cancelar</button>
+    </form>
+  `;
 
-  const clientToEdit = items.find(
-    (item) => item.cliente.toLowerCase() === clientName.toLowerCase()
-  );
+  // Evento para manejar el envío del formulario
+  document
+    .getElementById("add-client-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const clientName = document.getElementById("client-name").value.trim();
+      const maxId = clients.length > 0 ? Math.max(...clients.map((c) => c.id)) : 0;
+      const newId = maxId + 1;
+
+      clients.push({ id: newId, cliente: clientName });
+      alert("Cliente agregado con éxito");
+      document.getElementById("clients-btn").click(); // Volver a la tabla
+    });
+
+  // Cancelar y volver a la tabla
+  document
+    .getElementById("cancel-add-client")
+    .addEventListener("click", () => {
+      document.getElementById("clients-btn").click();
+    });
+}
+
+// Función para editar un cliente
+function editClient(clientId) {
+  const clientToEdit = clients.find((client) => client.id === clientId);
 
   if (!clientToEdit) {
-    alert(`El cliente '${clientName}' no fue encontrado.`);
+    alert("Cliente no encontrado");
     return;
   }
 
-  let newClientName = prompt(
-    `Ingrese el nuevo nombre para el cliente '${clientToEdit.cliente}' (o presione Enter para mantener el nombre actual):`
-  );
+  document.getElementById("content").innerHTML = `
+    <h3>Editar Cliente</h3>
+    <form id="edit-client-form">
+      <label for="edit-client-name">Nombre del cliente:</label>
+      <input type="text" id="edit-client-name" value="${clientToEdit.cliente}" required />
+      <button type="submit">Guardar</button>
+      <button type="button" id="cancel-edit-client">Cancelar</button>
+    </form>
+  `;
 
-  clientToEdit.cliente = newClientName || clientToEdit.cliente;
+  // Evento para manejar el envío del formulario
+  document
+    .getElementById("edit-client-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
 
-  alert("Cliente editado con éxito");
+      const updatedName = document
+        .getElementById("edit-client-name")
+        .value.trim();
+
+      clientToEdit.cliente = updatedName;
+      alert("Cliente editado con éxito");
+      document.getElementById("clients-btn").click(); // Volver a la tabla
+    });
+
+  // Cancelar y volver a la tabla
+  document
+    .getElementById("cancel-edit-client")
+    .addEventListener("click", () => {
+      document.getElementById("clients-btn").click();
+    });
 }
 
-function deleteClient(items) {
-  let clientD = prompt("Ingrese el nombre del cliente a eliminar: ");
+// Función para eliminar un cliente
+function deleteClient(clientId) {
+  const index = clients.findIndex((client) => client.id === clientId);
 
-  let i = items.findIndex(
-    (item) => item.cliente.toLowerCase() === clientD.toLowerCase()
-  );
-
-  if (i !== -1) {
-    items.splice(i, 1);
+  if (index !== -1) {
+    clients.splice(index, 1); // Eliminar cliente del array
     alert("Cliente eliminado con éxito");
+    printClients(clients); // Actualizar la tabla
   } else {
     alert("Cliente no encontrado.");
   }
+}
+
+function printOrders(items) {
+  let msg = [];
+
+  for (let order of items) {
+    msg.push(`Orden ID: ${order.id}`);
+    msg.push(`Cliente ID: ${order.idCliente}`);
+    msg.push("Productos:");
+
+    for (let producto of order.productos) {
+      msg.push(
+        `  -Producto: ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total} MXN`
+      );
+    }
+
+    msg.push(`Total de la orden: $${order.total} MXN`);
+    msg.push("");
+  }
+
+  alert(msg.join("\n"));
 }
 
 function addOrder(orders, products) {
