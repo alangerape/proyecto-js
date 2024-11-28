@@ -171,11 +171,38 @@ document.getElementById("clients-btn").addEventListener("click", () => {
     });
 });
 
+// Mostrar tabla de órdenes
 document.getElementById("orders-btn").addEventListener("click", () => {
   document.getElementById("content").innerHTML = `
     <h3>Gestión de Órdenes</h3>
-    <p>Aquí puedes gestionar las órdenes de los clientes.</p>
+    <p>Aquí puedes agregar, editar o eliminar órdenes.</p>
+    
+    <!-- Barra de búsqueda -->
+    <input type="text" id="search-order" placeholder="Buscar por ID de cliente..." />
+
+    <!-- Contenedor para la tabla -->
+    <div id="order-table"></div>
+
+    <!-- Botón para añadir nueva orden -->
+    <button id="add-order-btn">Añadir Orden</button>
   `;
+
+  // Renderizar la tabla de órdenes
+  printOrders(orders);
+
+  // Evento para añadir nueva orden
+  document.getElementById("add-order-btn").addEventListener("click", () => {
+    showAddOrderForm();
+  });
+
+  // Evento para búsqueda en tiempo real
+  document.getElementById("search-order").addEventListener("input", (e) => {
+    const searchQuery = e.target.value.toLowerCase();
+    const filteredOrders = orders.filter((order) =>
+      order.idCliente.toString().includes(searchQuery)
+    );
+    printOrders(filteredOrders);
+  });
 });
 
 document.getElementById("logout-btn").addEventListener("click", () => {
@@ -511,158 +538,196 @@ function deleteClient(clientId) {
   }
 }
 
+// Función para renderizar la tabla de órdenes
 function printOrders(items) {
-  let msg = [];
+  const tableContent = items
+    .map(
+      (order) => `
+        <tr>
+          <td>${order.id}</td>
+          <td>${order.idCliente}</td>
+          <td>${order.productos
+            .map((p) => `${p.nombre} (x${p.cantidad})`)
+            .join(", ")}</td>
+          <td>${order.total}</td>
+          <td>
+            <button onclick="editOrder(${order.id})">Editar</button>
+            <button onclick="deleteOrder(${order.id})">Borrar</button>
+          </td>
+        </tr>
+      `
+    )
+    .join("");
 
-  for (let order of items) {
-    msg.push(`Orden ID: ${order.id}`);
-    msg.push(`Cliente ID: ${order.idCliente}`);
-    msg.push("Productos:");
+  const tableHTML = `
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>ID Cliente</th>
+          <th>Productos</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableContent}
+      </tbody>
+    </table>
+  `;
 
-    for (let producto of order.productos) {
-      msg.push(
-        `  -Producto: ${producto.nombre}: Cantidad ${producto.cantidad}, Total por producto: $${producto.total} MXN`
-      );
-    }
-
-    msg.push(`Total de la orden: $${order.total} MXN`);
-    msg.push("");
-  }
-
-  alert(msg.join("\n"));
+  document.getElementById("order-table").innerHTML = tableHTML;
 }
 
-function addOrder(orders, products) {
-  let idCliente = parseInt(
-    prompt("Ingrese el ID del cliente para esta orden: ")
-  );
+// Función para mostrar formulario de agregar orden
+function showAddOrderForm() {
+  document.getElementById("content").innerHTML = `
+    <h3>Agregar Orden</h3>
+    <form id="add-order-form">
+      <label for="client-id">ID Cliente:</label>
+      <input type="number" id="client-id" required />
+      
+      <div id="product-list">
+        <h4>Productos:</h4>
+        <button type="button" id="add-product">Añadir Producto</button>
+      </div>
+      
+      <button type="submit">Guardar Orden</button>
+      <button type="button" id="cancel-add-order">Cancelar</button>
+    </form>
+  `;
 
+  // Manejar productos en la orden
   let productosOrden = [];
-  let totalOrden = 0;
-
-  while (true) {
-    let productName = prompt(
-      "Ingrese el nombre del producto (o escriba 'salir' para terminar): "
-    );
-    if (productName.toLowerCase() === "salir") break;
-
-    let product = products.find(
-      (prod) => prod.producto.toLowerCase() === productName.toLowerCase()
+  document.getElementById("add-product").addEventListener("click", () => {
+    const productName = prompt("Nombre del producto:");
+    const cantidad = parseInt(prompt("Cantidad:"));
+    const product = products.find(
+      (p) => p.producto.toLowerCase() === productName.toLowerCase()
     );
 
-    if (!product) {
-      alert("Producto no encontrado. Intente nuevamente.");
-      continue;
+    if (!product || cantidad > product.cantidad) {
+      alert("Producto no válido o cantidad insuficiente.");
+      return;
     }
-
-    let cantidad = parseInt(prompt(`Ingrese la cantidad de ${productName}: `));
-
-    if (cantidad > product.cantidad) {
-      alert(
-        `Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`
-      );
-      continue;
-    }
-
-    let totalProducto = product.precio * cantidad;
-    totalOrden += totalProducto;
-
-    let productoEnOrden = {
-      id: product.id,
-      nombre: product.producto,
-      cantidad: cantidad,
-      total: totalProducto,
-    };
 
     product.cantidad -= cantidad;
+    productosOrden.push({
+      id: product.id,
+      nombre: product.producto,
+      cantidad,
+      total: product.precio * cantidad,
+    });
 
-    productosOrden.push(productoEnOrden);
-  }
+    alert("Producto añadido a la orden.");
+  });
 
-  const maxId = orders.length > 0 ? Math.max(...orders.map((o) => o.id)) : 1;
-  const newId = maxId + 1;
+  // Guardar la nueva orden
+  document.getElementById("add-order-form").addEventListener("submit", (event) => {
+    event.preventDefault();
 
-  const newOrder = {
-    id: newId,
-    idCliente: idCliente,
-    productos: productosOrden,
-    total: totalOrden,
-  };
+    const idCliente = parseInt(document.getElementById("client-id").value);
+    const totalOrden = productosOrden.reduce((sum, p) => sum + p.total, 0);
+    const maxId = orders.length > 0 ? Math.max(...orders.map((o) => o.id)) : 1;
 
-  orders.push(newOrder);
+    orders.push({
+      id: maxId + 1,
+      idCliente,
+      productos: productosOrden,
+      total: totalOrden,
+    });
 
-  alert("Orden agregada con éxito");
+    alert("Orden añadida con éxito.");
+    document.getElementById("orders-btn").click();
+  });
+
+  // Cancelar
+  document.getElementById("cancel-add-order").addEventListener("click", () => {
+    document.getElementById("orders-btn").click();
+  });
 }
 
-function editOrder(orders, products) {
-  let orderId = parseInt(prompt("Ingrese el ID de la orden a editar: "));
-
-  let orderToEdit = orders.find((order) => order.id === orderId);
+// Función para editar una orden
+function editOrder(orderId) {
+  const orderToEdit = orders.find((order) => order.id === orderId);
 
   if (!orderToEdit) {
-    alert(`La orden con ID '${orderId}' no fue encontrada.`);
+    alert("Orden no encontrada.");
     return;
   }
 
-  let totalOrden = 0;
-  let productosOrden = [];
+  let productosOrden = [...orderToEdit.productos];
+  let totalOrden = orderToEdit.total;
 
-  while (true) {
-    let productName = prompt(
-      "Ingrese el nombre del producto a agregar o modificar en la orden (o escriba 'salir' para terminar): "
+  document.getElementById("content").innerHTML = `
+    <h3>Editar Orden</h3>
+    <form id="edit-order-form">
+      <label for="edit-client-id">ID Cliente:</label>
+      <input type="number" id="edit-client-id" value="${orderToEdit.idCliente}" required />
+      
+      <div id="edit-product-list">
+        <h4>Productos:</h4>
+        <button type="button" id="add-product-edit">Añadir/Modificar Producto</button>
+      </div>
+      
+      <button type="submit">Guardar Cambios</button>
+      <button type="button" id="cancel-edit-order">Cancelar</button>
+    </form>
+  `;
+
+  document.getElementById("add-product-edit").addEventListener("click", () => {
+    const productName = prompt("Nombre del producto:");
+    const cantidad = parseInt(prompt("Cantidad:"));
+    const product = products.find(
+      (p) => p.producto.toLowerCase() === productName.toLowerCase()
     );
-    if (productName.toLowerCase() === "salir") break;
 
-    let product = products.find(
-      (prod) => prod.producto.toLowerCase() === productName.toLowerCase()
-    );
-
-    if (!product) {
-      alert("Producto no encontrado. Intente nuevamente.");
-      continue;
+    if (!product || cantidad > product.cantidad) {
+      alert("Producto no válido o cantidad insuficiente.");
+      return;
     }
-
-    let cantidad = parseInt(prompt(`Ingrese la cantidad de ${productName}: `));
-
-    if (cantidad > product.cantidad) {
-      alert(
-        `Cantidad insuficiente en inventario. Disponible: ${product.cantidad}`
-      );
-      continue;
-    }
-
-    let totalProducto = product.precio * cantidad;
-    totalOrden += totalProducto;
-
-    let productoEnOrden = {
-      id: product.id,
-      nombre: product.producto,
-      cantidad: cantidad,
-      total: totalProducto,
-    };
 
     product.cantidad -= cantidad;
+    const existing = productosOrden.find((p) => p.id === product.id);
+    if (existing) {
+      existing.cantidad += cantidad;
+      existing.total += product.precio * cantidad;
+    } else {
+      productosOrden.push({
+        id: product.id,
+        nombre: product.producto,
+        cantidad,
+        total: product.precio * cantidad,
+      });
+    }
 
-    productosOrden.push(productoEnOrden);
-  }
+    totalOrden = productosOrden.reduce((sum, p) => sum + p.total, 0);
+    alert("Producto actualizado.");
+  });
 
-  orderToEdit.productos = productosOrden;
-  orderToEdit.total = totalOrden;
+  document.getElementById("edit-order-form").addEventListener("submit", (event) => {
+    event.preventDefault();
 
-  alert("Orden editada con éxito");
+    orderToEdit.idCliente = parseInt(
+      document.getElementById("edit-client-id").value
+    );
+    orderToEdit.productos = productosOrden;
+    orderToEdit.total = totalOrden;
+
+    alert("Orden actualizada con éxito.");
+    document.getElementById("orders-btn").click();
+  });
+
+  document
+    .getElementById("cancel-edit-order")
+    .addEventListener("click", () => {
+      document.getElementById("orders-btn").click();
+    });
 }
 
-function deleteOrder(items) {
-  printOrders(items);
-
-  let orderId = parseInt(prompt("Ingrese el ID de la orden a eliminar: "));
-
-  let index = items.findIndex((item) => item.id === orderId);
-
-  if (index !== -1) {
-    items.splice(index, 1);
-    alert("Orden eliminada con éxito.");
-  } else {
-    alert("Orden no encontrada.");
-  }
+// Función para borrar una orden
+function deleteOrder(orderId) {
+  orders = orders.filter((order) => order.id !== orderId);
+  alert("Orden eliminada con éxito.");
+  printOrders(orders);
 }
