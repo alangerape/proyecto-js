@@ -1,0 +1,223 @@
+/* Estilo para centrar solo el login */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f4f4;
+}
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
+}
+
+.login-container {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centrado vertical dentro del contenedor */
+    align-items: center; /* Centrado horizontal dentro del contenedor */
+    min-width: 300px; /* Ancho mínimo para la tarjeta */
+    max-width: 400px; /* Ancho máximo de la tarjeta */
+    width: 100%; /* Asegura que el contenedor se ajuste */
+}
+
+/* Estilo para las etiquetas de los campos */
+.login-container label {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Estilo para los campos de entrada */
+.login-container input {
+    width: 100%;
+    padding: 12px;  /* Aumentamos el padding para mejorar la estética */
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;  /* Asegura que el padding no afecte al ancho total */
+    transition: border-color 0.3s;
+}
+
+.login-container input:focus {
+    border-color: #007BFF; /* Azul eléctrico en el borde cuando se selecciona */
+    outline: none;
+}
+
+/* Botón de envío */
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007BFF; /* Azul eléctrico */
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-container button:hover {
+    background-color: #0056b3; /* Un tono más oscuro de azul eléctrico */
+}
+
+/* Mensaje de error */
+#error-message {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Agregar un poco de espacio entre el formulario y el borde */
+#login-form {
+    width: 100%;
+}
+
+#admin-panel {
+    display: block; /* Cambiar a block cuando el panel esté visible */
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+#admin-container {
+    display: flex;
+    height: 100%;
+}
+
+#menu {
+    width: 250px; /* Ajusta el tamaño del panel de navegación */
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#menu ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#menu li {
+    margin-bottom: 15px;
+}
+
+#menu button {
+    width: 100%;
+    padding: 10px;
+    background-color: #444;
+    border: none;
+    color: white;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#menu button:hover {
+    background-color: #007bff;
+}
+
+#content {
+    flex-grow: 1; /* El contenido ocupará el resto del espacio disponible */
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    padding: 20px;
+    background-color: white;
+    box-sizing: border-box;
+    text-align: center; /* Centra el texto */
+}
+
+#content h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+#content p {
+    font-size: 18px;
+    color: #666;
+}
+
+#content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Alinea todo al inicio verticalmente */
+    padding: 20px;
+    background-color: white;
+    box-sizing: border-box;
+    text-align: center;
+    flex-direction: column; /* Esto organiza los elementos en una columna */
+    gap: 20px; /* Añadimos espacio entre los elementos */
+}
+
+h3 {
+    font-size: 24px;
+    color: #333;
+}
+
+p {
+    font-size: 18px;
+    color: #666;
+}
+
+/* Estilo para el campo de búsqueda */
+#search-bar {
+    margin-bottom: 10px;
+    width: 50%; /* Ajustamos el ancho para que se vea bien */
+    padding: 5px;
+    text-align: center;
+}
+
+/* Estilo para el botón Añadir */
+#add-product-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#add-product-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para la tabla de productos */
+#product-table {
+    width: 100%; /* Asegura que la tabla ocupe todo el ancho disponible */
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#product-table td, #product-table th {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+
+@media (max-width: 768px) {
+    #admin-container {
+        flex-direction: column; /* Los elementos se apilan verticalmente en pantallas pequeñas */
+    }
+
+    #menu {
+        width: 100%; /* El menú ocupa todo el ancho en pantallas pequeñas */
+        height: auto;
+        position: relative;
+    }
+
+    #content {
+        margin-top: 20px; /* Separar el contenido del menú */
+    }
+}

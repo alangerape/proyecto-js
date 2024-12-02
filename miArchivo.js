@@ -83,7 +83,14 @@ function login(event) {
   const logUsr = document.getElementById("username").value;
   const logPass = document.getElementById("password").value;
 
-  // Verificar credenciales
+  console.log("Usuario ingresado:", logUsr); // Imprimir valor del usuario ingresado
+  console.log("Contraseña ingresada:", logPass); // Imprimir valor de la contraseña ingresada
+
+  // Obtener contenedores
+  const loginContainer = document.querySelector(".login-wrapper");
+  const adminPanel = document.getElementById("admin-panel");
+
+  // Verificar credenciales usando las credenciales globales
   if (logUsr === user && logPass === pass) {
     alert("Inicio de sesión exitoso");
 
@@ -103,19 +110,19 @@ function login(event) {
   }
 }
 
-// Manejar las opciones del panel
 document.getElementById("products-btn").addEventListener("click", () => {
   document.getElementById("content").innerHTML = `
     <h3>Gestión de Productos</h3>
     <p>Aquí puedes agregar, editar o eliminar productos.</p>
     <input 
-      type="text" 
-      id="search-bar" 
-      placeholder="Buscar producto..." 
-      style="margin-bottom: 10px; width: 20%; padding: 5px;"
+    type="text" 
+    id="search-bar" 
+    placeholder="Buscar producto..." 
+    style="margin-bottom: 10px; width: 20%; padding: 5px;"
     />
     <div id="product-table"></div>
     <button id="add-product-btn">Añadir</button>
+
   `;
 
   // Renderizar la tabla de productos
@@ -123,7 +130,7 @@ document.getElementById("products-btn").addEventListener("click", () => {
 
   // Evento para el botón de agregar producto
   document.getElementById("add-product-btn").addEventListener("click", () => {
-    showAddProductForm();
+    renderAddProductForm(); // Ahora llama a esta función para redirigir al formulario
   });
 
   // Evento para la barra de búsqueda
@@ -171,37 +178,36 @@ document.getElementById("clients-btn").addEventListener("click", () => {
     });
 });
 
-// Mostrar tabla de órdenes
 document.getElementById("orders-btn").addEventListener("click", () => {
   document.getElementById("content").innerHTML = `
-    <h3>Gestión de Órdenes</h3>
-    <p>Aquí puedes agregar, editar o eliminar órdenes.</p>
-    
-    <!-- Barra de búsqueda -->
-    <input type="text" id="search-order" placeholder="Buscar por ID de cliente..." />
+      <h3>Gestión de Órdenes</h3>
+      <p>Aquí puedes agregar, editar o eliminar órdenes.</p>
+      <div>
+        <input type="text" id="search-orders" placeholder="Buscar órdenes por cliente..." />
+      </div>
+      <div id="order-table"></div>
+      <button id="add-order-btn">Añadir Orden</button>
+    `;
 
-    <!-- Contenedor para la tabla -->
-    <div id="order-table"></div>
-
-    <!-- Botón para añadir nueva orden -->
-    <button id="add-order-btn">Añadir Orden</button>
-  `;
-
-  // Renderizar la tabla de órdenes
+  // Renderizar tabla de órdenes
   printOrders(orders);
 
-  // Evento para añadir nueva orden
-  document.getElementById("add-order-btn").addEventListener("click", () => {
-    showAddOrderForm();
-  });
-
-  // Evento para búsqueda en tiempo real
-  document.getElementById("search-order").addEventListener("input", (e) => {
+  // Filtro de búsqueda
+  document.getElementById("search-orders").addEventListener("input", (e) => {
     const searchQuery = e.target.value.toLowerCase();
     const filteredOrders = orders.filter((order) =>
-      order.idCliente.toString().includes(searchQuery)
+      clients.some(
+        (client) =>
+          client.id === order.idCliente &&
+          client.cliente.toLowerCase().includes(searchQuery)
+      )
     );
     printOrders(filteredOrders);
+  });
+
+  // Evento para añadir una nueva orden
+  document.getElementById("add-order-btn").addEventListener("click", () => {
+    addOrder(); // Llama a la función definida anteriormente
   });
 });
 
@@ -268,8 +274,8 @@ function printProdcs(items) {
   document.getElementById("product-table").innerHTML = tableHTML;
 }
 
-function showAddProductForm() {
-  // Cambiar el contenido para mostrar el formulario de añadir producto
+function addProduct() {
+  // Mostrar el formulario de añadir producto
   document.getElementById("panel-content").innerHTML = `
     <h3>Agregar Producto</h3>
     <form id="add-product-form">
@@ -297,6 +303,75 @@ function showAddProductForm() {
       event.preventDefault(); // Evitar recarga de página
 
       // Capturar los datos del formulario
+      const productName = document.getElementById("product-name").value.trim();
+      const productQuantity = parseInt(
+        document.getElementById("product-quantity").value
+      );
+      const productPrice = parseFloat(
+        document.getElementById("product-price").value
+      );
+
+      // Validar los datos capturados
+      if (!productName || productQuantity <= 0 || productPrice <= 0) {
+        alert("Por favor, introduce valores válidos.");
+        return;
+      }
+
+      // Verificar si el producto ya existe
+      const exists = products.some(
+        (item) => item.producto.toLowerCase() === productName.toLowerCase()
+      );
+
+      if (exists) {
+        alert(`El producto '${productName}' ya existe.`);
+        return;
+      }
+
+      // Obtener el ID del nuevo producto
+      const maxId =
+        products.length > 0 ? Math.max(...products.map((p) => p.id)) : 1200;
+      const newId = maxId + 1;
+
+      // Crear un nuevo objeto de producto
+      const newProduct = {
+        id: newId,
+        producto: productName,
+        cantidad: productQuantity,
+        precio: productPrice,
+      };
+
+      // Agregar el producto al array
+      products.push(newProduct);
+
+      alert("Producto agregado con éxito");
+
+      // Volver a mostrar la tabla con el nuevo producto
+      renderTableView();
+    });
+}
+
+function renderAddProductForm() {
+  // Cambiar el contenido para mostrar el formulario de añadir producto
+  document.getElementById("content").innerHTML = `
+    <h3>Agregar Producto</h3>
+    <form id="add-product-form">
+      <label for="product-name">Producto:</label>
+      <input type="text" id="product-name" required />
+      <label for="product-quantity">Cantidad:</label>
+      <input type="number" id="product-quantity" required />
+      <label for="product-price">Precio:</label>
+      <input type="number" id="product-price" required />
+      <button type="submit">Añadir Producto</button>
+    </form>
+    <button id="cancel-add-btn">Cancelar</button>
+  `;
+
+  // Evento para manejar el envío del formulario
+  document
+    .getElementById("add-product-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+
       const productName = document.getElementById("product-name").value;
       const productQuantity = parseInt(
         document.getElementById("product-quantity").value
@@ -305,42 +380,13 @@ function showAddProductForm() {
         document.getElementById("product-price").value
       );
 
-      // Llamar a la función addProduct con los valores capturados
       addProduct(productName, productQuantity, productPrice);
     });
-}
 
-function addProduct(product, qty, price) {
-  // Verificar si el producto ya existe
-  const exists = products.some(
-    (item) => item.producto.toLowerCase() === product.toLowerCase()
-  );
-
-  if (exists) {
-    alert(`El producto '${product}' ya existe.`);
-    return;
-  }
-
-  // Obtener el ID del nuevo producto
-  const maxId =
-    products.length > 0 ? Math.max(...products.map((p) => p.id)) : 1200;
-  const newId = maxId + 1;
-
-  // Crear un nuevo objeto de producto
-  const newProduct = {
-    id: newId,
-    producto: product,
-    cantidad: qty,
-    precio: price,
-  };
-
-  // Agregar el producto al array
-  products.push(newProduct);
-
-  alert("Producto agregado con éxito");
-
-  // Volver a mostrar la tabla con el nuevo producto
-  renderTableView();
+  // Evento para cancelar
+  document.getElementById("cancel-add-btn").addEventListener("click", () => {
+    document.getElementById("products-btn").click(); // Volver a la gestión de productos
+  });
 }
 
 function editProduct(productId) {
@@ -467,7 +513,8 @@ function showAddClientForm() {
       event.preventDefault();
 
       const clientName = document.getElementById("client-name").value.trim();
-      const maxId = clients.length > 0 ? Math.max(...clients.map((c) => c.id)) : 0;
+      const maxId =
+        clients.length > 0 ? Math.max(...clients.map((c) => c.id)) : 0;
       const newId = maxId + 1;
 
       clients.push({ id: newId, cliente: clientName });
@@ -476,11 +523,9 @@ function showAddClientForm() {
     });
 
   // Cancelar y volver a la tabla
-  document
-    .getElementById("cancel-add-client")
-    .addEventListener("click", () => {
-      document.getElementById("clients-btn").click();
-    });
+  document.getElementById("cancel-add-client").addEventListener("click", () => {
+    document.getElementById("clients-btn").click();
+  });
 }
 
 // Función para editar un cliente
@@ -579,8 +624,7 @@ function printOrders(items) {
   document.getElementById("order-table").innerHTML = tableHTML;
 }
 
-// Función para mostrar formulario de agregar orden
-function showAddOrderForm() {
+function addOrder() {
   document.getElementById("content").innerHTML = `
     <h3>Agregar Orden</h3>
     <form id="add-order-form">
@@ -589,7 +633,21 @@ function showAddOrderForm() {
       
       <div id="product-list">
         <h4>Productos:</h4>
-        <button type="button" id="add-product">Añadir Producto</button>
+        <div id="added-products"></div>
+        <div>
+          <label for="product-name">Producto:</label>
+          <select id="product-name">
+            ${products
+              .map(
+                (product) =>
+                  `<option value="${product.id}">${product.producto}</option>`
+              )
+              .join("")}
+          </select>
+          <label for="product-quantity">Cantidad:</label>
+          <input type="number" id="product-quantity" min="1" />
+          <button type="button" id="add-product">Añadir Producto</button>
+        </div>
       </div>
       
       <button type="submit">Guardar Orden</button>
@@ -597,14 +655,15 @@ function showAddOrderForm() {
     </form>
   `;
 
-  // Manejar productos en la orden
   let productosOrden = [];
+
   document.getElementById("add-product").addEventListener("click", () => {
-    const productName = prompt("Nombre del producto:");
-    const cantidad = parseInt(prompt("Cantidad:"));
-    const product = products.find(
-      (p) => p.producto.toLowerCase() === productName.toLowerCase()
+    const productId = parseInt(document.getElementById("product-name").value);
+    const cantidad = parseInt(
+      document.getElementById("product-quantity").value
     );
+
+    const product = products.find((p) => p.id === productId);
 
     if (!product || cantidad > product.cantidad) {
       alert("Producto no válido o cantidad insuficiente.");
@@ -612,36 +671,57 @@ function showAddOrderForm() {
     }
 
     product.cantidad -= cantidad;
-    productosOrden.push({
-      id: product.id,
-      nombre: product.producto,
-      cantidad,
-      total: product.precio * cantidad,
-    });
 
-    alert("Producto añadido a la orden.");
+    const existingProduct = productosOrden.find((p) => p.id === productId);
+    if (existingProduct) {
+      existingProduct.cantidad += cantidad;
+      existingProduct.total += product.precio * cantidad;
+    } else {
+      productosOrden.push({
+        id: product.id,
+        nombre: product.producto,
+        cantidad,
+        total: product.precio * cantidad,
+      });
+    }
+
+    renderAddedProducts(productosOrden);
   });
 
-  // Guardar la nueva orden
-  document.getElementById("add-order-form").addEventListener("submit", (event) => {
-    event.preventDefault();
+  function renderAddedProducts(productos) {
+    const productList = document.getElementById("added-products");
+    productList.innerHTML = productos
+      .map(
+        (p) => `
+        <div>
+          ${p.nombre} - Cantidad: ${p.cantidad}, Total: ${p.total}
+        </div>
+      `
+      )
+      .join("");
+  }
 
-    const idCliente = parseInt(document.getElementById("client-id").value);
-    const totalOrden = productosOrden.reduce((sum, p) => sum + p.total, 0);
-    const maxId = orders.length > 0 ? Math.max(...orders.map((o) => o.id)) : 1;
+  document
+    .getElementById("add-order-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
 
-    orders.push({
-      id: maxId + 1,
-      idCliente,
-      productos: productosOrden,
-      total: totalOrden,
+      const idCliente = parseInt(document.getElementById("client-id").value);
+      const totalOrden = productosOrden.reduce((sum, p) => sum + p.total, 0);
+      const maxId =
+        orders.length > 0 ? Math.max(...orders.map((o) => o.id)) : 1;
+
+      orders.push({
+        id: maxId + 1,
+        idCliente,
+        productos: productosOrden,
+        total: totalOrden,
+      });
+
+      alert("Orden añadida con éxito.");
+      document.getElementById("orders-btn").click();
     });
 
-    alert("Orden añadida con éxito.");
-    document.getElementById("orders-btn").click();
-  });
-
-  // Cancelar
   document.getElementById("cancel-add-order").addEventListener("click", () => {
     document.getElementById("orders-btn").click();
   });
@@ -664,7 +744,9 @@ function editOrder(orderId) {
     <h3>Editar Orden</h3>
     <form id="edit-order-form">
       <label for="edit-client-id">ID Cliente:</label>
-      <input type="number" id="edit-client-id" value="${orderToEdit.idCliente}" required />
+      <input type="number" id="edit-client-id" value="${
+        orderToEdit.idCliente
+      }" required />
       
       <div id="edit-product-list">
         <h4>Productos:</h4>
@@ -758,16 +840,20 @@ function editOrder(orderId) {
   }
 
   // Evento para guardar los cambios en la orden
-  document.getElementById("edit-order-form").addEventListener("submit", (event) => {
-    event.preventDefault();
+  document
+    .getElementById("edit-order-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
 
-    orderToEdit.idCliente = parseInt(document.getElementById("edit-client-id").value);
-    orderToEdit.productos = productosOrden;
-    orderToEdit.total = totalOrden;
+      orderToEdit.idCliente = parseInt(
+        document.getElementById("edit-client-id").value
+      );
+      orderToEdit.productos = productosOrden;
+      orderToEdit.total = totalOrden;
 
-    alert("Orden actualizada con éxito.");
-    document.getElementById("orders-btn").click();
-  });
+      alert("Orden actualizada con éxito.");
+      document.getElementById("orders-btn").click();
+    });
 
   // Evento para cancelar la edición
   document.getElementById("cancel-edit-order").addEventListener("click", () => {
@@ -777,7 +863,6 @@ function editOrder(orderId) {
   // Inicializar la lista de productos
   renderProductList();
 }
-
 
 // Función para borrar una orden
 function deleteOrder(orderId) {
