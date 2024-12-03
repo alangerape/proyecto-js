@@ -217,23 +217,9 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   loginContainer.style.display = "block";
 });
 
-function renderTableView() {
-  // Cambiar el contenido del panel para mostrar la tabla y el botón de añadir
-  document.getElementById("panel-content").innerHTML = `
-    <h3>Gestión de Productos</h3>
-    <p>Aquí puedes agregar, editar o eliminar productos.</p>
-    <div id="product-table"></div>
-    <button id="add-product-btn">Añadir</button>
-  `;
-
-  // Volver a renderizar la tabla de productos
-  printProdcs(products);
-
-  // Vincular de nuevo el evento de "Añadir"
-  document.getElementById("add-product-btn").addEventListener("click", () => {
-    showAddProductForm();
-  });
-}
+document.addEventListener("DOMContentLoaded", () => {
+  renderTableView(); // Renderiza la tabla al cargar
+});
 
 function printProdcs(items) {
   const tableContent = items
@@ -272,6 +258,11 @@ function printProdcs(items) {
 
   // Insertar la tabla en el div con ID "product-table"
   document.getElementById("product-table").innerHTML = tableHTML;
+}
+
+
+function renderTableView() {
+  printProdcs(products); // Re-renderiza la tabla con los productos actualizados
 }
 
 function addProduct() {
@@ -390,7 +381,7 @@ function renderAddProductForm() {
 }
 
 function editProduct(productId) {
-  // Buscar el producto por ID
+  // Encuentra el producto en el array
   const productToEdit = products.find((item) => item.id === productId);
 
   if (!productToEdit) {
@@ -398,51 +389,47 @@ function editProduct(productId) {
     return;
   }
 
-  // Cambiar el contenido del panel para mostrar el formulario de editar
-  document.getElementById("panel-content").innerHTML = `
+  // Renderiza el formulario para editar el producto
+  document.getElementById("content").innerHTML = `
     <h3>Editar Producto</h3>
     <form id="edit-product-form">
-      <label for="edit-product-name">Producto:</label>
+      <label for="edit-product-name">Nombre del Producto:</label>
       <input type="text" id="edit-product-name" value="${productToEdit.producto}" required />
+      
       <label for="edit-product-quantity">Cantidad:</label>
       <input type="number" id="edit-product-quantity" value="${productToEdit.cantidad}" required />
+      
       <label for="edit-product-price">Precio:</label>
       <input type="number" id="edit-product-price" value="${productToEdit.precio}" required />
+      
       <button type="submit">Guardar Cambios</button>
+      <button type="button" id="cancel-edit-product">Cancelar</button>
     </form>
-    <button id="cancel-edit-btn">Cancelar</button>
   `;
 
-  // Evento para cancelar la edición y volver a la vista de la tabla
-  document.getElementById("cancel-edit-btn").addEventListener("click", () => {
-    renderTableView();
-  });
-
-  // Evento para manejar el envío del formulario de edición
+  // Maneja la actualización del producto
   document
     .getElementById("edit-product-form")
     .addEventListener("submit", (event) => {
-      event.preventDefault(); // Evitar recarga de página
+      event.preventDefault();
 
-      // Capturar los nuevos valores del formulario
-      const editedProductName =
-        document.getElementById("edit-product-name").value;
-      const editedProductQuantity = parseInt(
-        document.getElementById("edit-product-quantity").value
-      );
-      const editedProductPrice = parseFloat(
-        document.getElementById("edit-product-price").value
-      );
+      // Actualiza los valores del producto
+      productToEdit.producto = document.getElementById("edit-product-name").value;
+      productToEdit.cantidad = parseInt(document.getElementById("edit-product-quantity").value);
+      productToEdit.precio = parseFloat(document.getElementById("edit-product-price").value);
 
-      // Actualizar el producto con los nuevos valores
-      productToEdit.producto = editedProductName;
-      productToEdit.cantidad = editedProductQuantity;
-      productToEdit.precio = editedProductPrice;
+      alert("Producto actualizado con éxito.");
+      
+      // Renderiza nuevamente la tabla
+      printProdcs(products);
+    });
 
-      alert("Producto editado con éxito");
-
-      // Volver a mostrar la tabla con los cambios
-      renderTableView();
+  // Maneja la cancelación
+  document
+    .getElementById("cancel-edit-product")
+    .addEventListener("click", () => {
+      // Renderiza nuevamente la tabla
+      printProdcs(products);
     });
 }
 
